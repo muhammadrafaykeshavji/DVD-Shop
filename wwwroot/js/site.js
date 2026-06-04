@@ -53,49 +53,86 @@
   });
 })();
 
-// Admin panel — sidebar toggle (all breakpoints)
+// Admin panel — sidebar toggle (persists across page loads)
 (() => {
   const body = document.body;
+  const root = document.documentElement;
   if (!body.classList.contains("cv-admin-body")) return;
 
   const toggle = document.querySelector("[data-cv-admin-sidebar-toggle]");
   const backdrop = document.querySelector("[data-cv-admin-sidebar-backdrop]");
-  const sidebar = document.getElementById("cvAdminSidebar");
   const desktopMq = window.matchMedia("(min-width: 992px)");
+  const STORAGE_OPEN = "cvAdminSidebarOpen";
+  const STORAGE_CLOSED = "cvAdminSidebarClosed";
 
-  const isOpen = () => body.classList.contains("cv-admin-sidebar-is-open");
+  const isDesktop = () => desktopMq.matches;
 
-  const setOpen = (open) => {
-    body.classList.toggle("cv-admin-sidebar-is-open", open);
+  const isOpen = () => {
+    if (isDesktop()) {
+      return root.getAttribute("data-admin-sidebar") !== "closed";
+    }
+    return root.getAttribute("data-admin-sidebar") === "open";
+  };
+
+  const persist = (open) => {
+    try {
+      if (isDesktop()) {
+        sessionStorage.setItem(STORAGE_CLOSED, open ? "0" : "1");
+        sessionStorage.removeItem(STORAGE_OPEN);
+      } else {
+        sessionStorage.setItem(STORAGE_OPEN, open ? "1" : "0");
+      }
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const applyState = (open, { animate = false } = {}) => {
+    const state = open ? "open" : "closed";
+    root.setAttribute("data-admin-sidebar", state);
+    body.classList.toggle("cv-admin-sidebar-is-open", open && !isDesktop());
+    body.classList.toggle("cv-admin-sidebar-is-closed", !open && isDesktop());
+    body.classList.toggle("cv-admin-sidebar-animate", animate);
     toggle?.setAttribute("aria-expanded", String(open));
-    if (open && !desktopMq.matches) {
+    if (open && !isDesktop()) {
       body.style.overflow = "hidden";
     } else {
       body.style.overflow = "";
     }
   };
 
-  const syncForBreakpoint = () => {
-    if (desktopMq.matches) {
-      setOpen(true);
-    } else {
-      setOpen(false);
+  const syncFromStorage = () => {
+    let open = true;
+    try {
+      if (isDesktop()) {
+        open = sessionStorage.getItem(STORAGE_CLOSED) !== "1";
+      } else {
+        open = sessionStorage.getItem(STORAGE_OPEN) === "1";
+      }
+    } catch {
+      open = isDesktop();
     }
+    applyState(open, { animate: false });
   };
 
-  toggle?.addEventListener("click", () => setOpen(!isOpen()));
-  backdrop?.addEventListener("click", () => setOpen(false));
+  toggle?.addEventListener("click", () => {
+    const next = !isOpen();
+    persist(next);
+    applyState(next, { animate: true });
+  });
 
-  sidebar?.querySelectorAll(".nav-link").forEach((link) => {
-    link.addEventListener("click", () => {
-      if (!desktopMq.matches) setOpen(false);
-    });
+  backdrop?.addEventListener("click", () => {
+    persist(false);
+    applyState(false, { animate: true });
   });
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && isOpen()) setOpen(false);
+    if (e.key === "Escape" && isOpen()) {
+      persist(false);
+      applyState(false, { animate: true });
+    }
   });
 
-  desktopMq.addEventListener("change", syncForBreakpoint);
-  syncForBreakpoint();
+  desktopMq.addEventListener("change", syncFromStorage);
+  syncFromStorage();
 })();

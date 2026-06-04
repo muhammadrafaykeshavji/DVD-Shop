@@ -46,6 +46,34 @@ body {
   font-family: var(--font-body);
   background-color: var(--cv-bg);
   color: var(--cv-text);
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Sticky footer — content grows, footer stays at bottom of page */
+.cv-site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.cv-site > header {
+  flex-shrink: 0;
+}
+
+.cv-site > .main-content {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.cv-site > .cv-footer {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.cv-auth-body .cv-site {
+  min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -1700,6 +1728,13 @@ html {
 }
 
 /* Footer */
+.cv-footer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 2rem;
+}
+
 .cv-footer h6 {
   font-family: var(--font-ui);
 }
@@ -1945,7 +1980,7 @@ html {
   border-radius: 12px;
   padding: 1.35rem 1.5rem;
   box-shadow: var(--cv-shadow-sm);
-  height: 100%;
+  height: auto;
 }
 
 .cv-dash-panel--sidebar {
@@ -2084,6 +2119,14 @@ html {
 }
 
 /* Profile page */
+.cv-profile-page {
+  padding-bottom: 0.5rem;
+}
+
+.cv-profile-page .row > [class*="col-"] {
+  align-self: flex-start;
+}
+
 .cv-profile-page .cv-profile-hero-inner {
   display: flex;
   flex-wrap: wrap;
@@ -2314,16 +2357,29 @@ html {
   overflow-x: hidden;
 }
 
-/* Main column — shifts when sidebar is open (toggle controls body class) */
+/* Main column — shifts when sidebar is open */
 .cv-admin-topbar,
 .cv-admin-content {
   width: 100%;
   max-width: 100%;
   margin-left: 0;
   box-sizing: border-box;
-  transition: margin-left 0.25s ease, width 0.25s ease, max-width 0.25s ease;
 }
 
+.cv-admin-sidebar {
+  border-top: 3px solid var(--cv-gold);
+  z-index: 1050;
+  transform: translateX(-100%);
+}
+
+/* Mobile / tablet: off-canvas unless open */
+html[data-admin-sidebar="open"] .cv-admin-sidebar,
+.cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar {
+  transform: translateX(0);
+}
+
+html[data-admin-sidebar="open"] .cv-admin-topbar,
+html[data-admin-sidebar="open"] .cv-admin-content,
 .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-topbar,
 .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-content {
   width: calc(100% - 250px);
@@ -2331,15 +2387,39 @@ html {
   margin-left: 250px;
 }
 
-.cv-admin-sidebar {
-  border-top: 3px solid var(--cv-gold);
-  z-index: 1050;
-  transform: translateX(-100%);
-  transition: transform 0.25s ease;
+/* Desktop: sidebar open by default (no slide-in on every page load) */
+@media (min-width: 992px) {
+  .cv-admin-sidebar {
+    transform: translateX(0);
+    transition: none;
+  }
+
+  .cv-admin-topbar,
+  .cv-admin-content {
+    width: calc(100% - 250px);
+    max-width: calc(100vw - 250px);
+    margin-left: 250px;
+    transition: margin-left 0.2s ease, width 0.2s ease, max-width 0.2s ease;
+  }
+
+  html[data-admin-sidebar="closed"] .cv-admin-sidebar,
+  .cv-admin-body.cv-admin-sidebar-is-closed .cv-admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  html[data-admin-sidebar="closed"] .cv-admin-topbar,
+  html[data-admin-sidebar="closed"] .cv-admin-content,
+  .cv-admin-body.cv-admin-sidebar-is-closed .cv-admin-topbar,
+  .cv-admin-body.cv-admin-sidebar-is-closed .cv-admin-content {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
 }
 
-.cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar {
-  transform: translateX(0);
+/* Animate only when user toggles (not on first paint) */
+.cv-admin-body.cv-admin-sidebar-animate .cv-admin-sidebar {
+  transition: transform 0.25s ease;
 }
 
 .cv-admin-sidebar-toggle {
@@ -2350,12 +2430,36 @@ html {
   display: none;
 }
 
+html[data-admin-sidebar="open"] .cv-admin-sidebar-toggle .fa-bars,
 .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar-toggle .fa-bars {
   display: none;
 }
 
+html[data-admin-sidebar="open"] .cv-admin-sidebar-toggle .fa-xmark,
 .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar-toggle .fa-xmark {
   display: inline-block;
+}
+
+@media (min-width: 992px) {
+  html[data-admin-sidebar="closed"] .cv-admin-sidebar-toggle .fa-bars,
+  .cv-admin-body.cv-admin-sidebar-is-closed .cv-admin-sidebar-toggle .fa-bars {
+    display: inline-block;
+  }
+
+  html[data-admin-sidebar="closed"] .cv-admin-sidebar-toggle .fa-xmark,
+  .cv-admin-body.cv-admin-sidebar-is-closed .cv-admin-sidebar-toggle .fa-xmark {
+    display: none;
+  }
+
+  html:not([data-admin-sidebar="closed"]) .cv-admin-sidebar-toggle .fa-bars,
+  .cv-admin-body:not(.cv-admin-sidebar-is-closed) .cv-admin-sidebar-toggle .fa-bars {
+    display: none;
+  }
+
+  html:not([data-admin-sidebar="closed"]) .cv-admin-sidebar-toggle .fa-xmark,
+  .cv-admin-body:not(.cv-admin-sidebar-is-closed) .cv-admin-sidebar-toggle .fa-xmark {
+    display: inline-block;
+  }
 }
 
 .cv-admin-sidebar .nav-link {

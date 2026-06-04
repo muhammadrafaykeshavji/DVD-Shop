@@ -12,6 +12,19 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/mockup1.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+    <script>
+        (function () {
+            var desktop = window.matchMedia("(min-width: 992px)").matches;
+            var closed = false;
+            var open = false;
+            try {
+                closed = sessionStorage.getItem("cvAdminSidebarClosed") === "1";
+                open = sessionStorage.getItem("cvAdminSidebarOpen") === "1";
+            } catch (e) { }
+            var state = desktop ? (closed ? "closed" : "open") : (open ? "open" : "closed");
+            document.documentElement.setAttribute("data-admin-sidebar", state);
+        })();
+    </script>
 </head>
 <body class="cv-admin-body">
     <button type="button" class="cv-admin-sidebar-backdrop" data-cv-admin-sidebar-backdrop aria-label="Close menu" tabindex="-1"></button>

@@ -241,3 +241,4 @@ F:\Projects\Aptech\C#\E-project DVD Shop\obj\Debug\net10.0\compressed\hpk1vx5hzl
 F:\Projects\Aptech\C#\E-project DVD Shop\obj\Debug\net10.0\compressed\zq10igcyyb-{0}-tp7z6ddb4t-tp7z6ddb4t.gz
 F:\Projects\Aptech\C#\E-project DVD Shop\obj\Debug\net10.0\compressed\jladmq0h4a-{0}-vs7s8d1xxz-vs7s8d1xxz.gz
 F:\Projects\Aptech\C#\E-project DVD Shop\obj\Debug\net10.0\compressed\eekv6pno8x-{0}-5wah1xigq6-5wah1xigq6.gz
+F:\Projects\Aptech\C#\E-project DVD Shop\obj\Debug\net10.0\E-project DVD Shop.sourcelink.json

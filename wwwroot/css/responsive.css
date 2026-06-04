@@ -415,11 +415,13 @@ svg {
   cursor: pointer;
 }
 
+html[data-admin-sidebar="open"] .cv-admin-sidebar-backdrop,
 .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar-backdrop {
   display: block;
 }
 
 @media (min-width: 992px) {
+  html[data-admin-sidebar="open"] .cv-admin-sidebar-backdrop,
   .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar-backdrop {
     display: none;
   }
@@ -447,6 +449,8 @@ svg {
 
 /* ---- Admin ---- */
 @media (max-width: 991.98px) {
+  html:not([data-admin-sidebar="open"]) .cv-admin-topbar,
+  html:not([data-admin-sidebar="open"]) .cv-admin-content,
   .cv-admin-body:not(.cv-admin-sidebar-is-open) .cv-admin-topbar,
   .cv-admin-body:not(.cv-admin-sidebar-is-open) .cv-admin-content {
     width: 100% !important;

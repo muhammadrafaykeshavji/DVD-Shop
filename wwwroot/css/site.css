@@ -1584,17 +1584,18 @@ a:hover { color: var(--cv-gold-hover); }
 .text-cv-secondary { color: var(--cv-text-secondary) !important; }
 .text-cv-muted { color: var(--cv-text-muted) !important; }
 .bg-cv-section { background: var(--cv-section); }
-/* Sticky footer: short pages (e.g. order history) keep footer at viewport bottom */
-body:not(.cv-auth-body) {
+/* Sticky footer (see mockup1.css .cv-site — layout wrapper in _Layout) */
+body:not(.cv-auth-body) .cv-site {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
-body:not(.cv-auth-body) > .main-content {
+body:not(.cv-auth-body) .cv-site > .main-content {
   flex: 1 0 auto;
 }
 
-body:not(.cv-auth-body) > .cv-footer {
+body:not(.cv-auth-body) .cv-site > .cv-footer {
   flex-shrink: 0;
 }
 
@@ -1810,7 +1811,7 @@ body:not(.cv-auth-body) > .cv-footer {
 .main-content:has(.cv-home-boutique) {
   padding-bottom: 1rem;
 }
-.main-content:has(.cv-home-boutique) + .cv-footer {
+.cv-site > .main-content:has(.cv-home-boutique) + .cv-footer {
   margin-top: 0.5rem;
   padding-top: 2rem;
 }
