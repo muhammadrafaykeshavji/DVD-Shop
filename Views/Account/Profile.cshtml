@@ -1,0 +1,163 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.ProfileImageUrl) ? null : Model.ProfileImageUrl;
+    var initials = Model.UserName.Length >= 2
+        ? Model.UserName[..2].ToUpperInvariant()
+        : (Model.UserName.Length == 1 ? Model.UserName.ToUpperInvariant() : "CV");
+    var memberSince = Model.MemberSince.ToLocalTime().ToString("MMMM yyyy");
+}
+
+<div class="cv-member-dashboard cv-profile-page">
+    <section class="cv-dash-hero cv-profile-hero">
+        <div class="cv-profile-hero-inner">
+            <div class="cv-profile-avatar-wrap">
+                <img id="cv-profile-avatar-img"
+                     src="@(avatarUrl ?? "")"
+                     alt="@Model.UserName"
+                     class="cv-profile-avatar @(avatarUrl == null ? "d-none" : "")"
+                     onerror="this.classList.add('d-none'); document.getElementById('cv-profile-avatar-fallback')?.classList.remove('d-none');" />
+                <span id="cv-profile-avatar-fallback" class="cv-profile-avatar cv-profile-avatar--initials @(avatarUrl != null ? "d-none" : "")">@initials</span>
+            </div>
+            <div class="cv-profile-hero-text">
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-user me-1"></i> Account settings</p>
+                <h1 class="cv-dash-title">@Model.UserName</h1>
+                <p class="cv-dash-sub mb-0">
+                    Member since @memberSince
+                    <span class="cv-profile-meta-dot" aria-hidden="true">·</span>
+                    <span class="text-cv-gold fw-semibold">$@Model.Balance.ToString("F2")</span> wallet balance
+                </p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="Account" asp-action="Dashboard" class="btn btn-cv-outline">
+                    <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+                </a>
+                <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-cv-outline">
+                    <i class="fa-solid fa-key me-2"></i>Change password
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="cv-dash-panel">
+                <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-id-card me-2 text-cv-gold"></i>Profile details</h2>
+                @using (Html.BeginForm("Profile", "Account", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UserName" />
+                    <input type="hidden" asp-for="Balance" />
+                    <input type="hidden" asp-for="MemberSince" />
+
+                    <div class="mb-3">
+                        <label asp-for="UserName" class="form-label"></label>
+                        <input asp-for="UserName" class="form-control" readonly />
+                        <div class="form-text">Username is set at registration and cannot be changed here.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ProfileImageUrl" class="form-label"></label>
+                        <input asp-for="ProfileImageUrl" class="form-control" id="ProfileImageUrl" placeholder="https://example.com/avatar.jpg" />
+                        @Html.ValidationMessageFor(m => m.ProfileImageUrl, "", new { @class = "text-danger small" })
+                        <div class="form-text">Paste an image URL for your profile photo.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="Optional" />
+                        @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger small" })
+                    </div>
+                    <button type="submit" class="btn btn-cv-primary">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Save changes
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="cv-dash-panel cv-dash-panel--sidebar mb-4">
+                <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-bolt me-2 text-cv-gold"></i>Quick links</h2>
+                <nav class="cv-dash-links">
+                    <a asp-controller="Order" asp-action="MyOrders" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-box"></i></span>
+                        <span>
+                            <strong>Order history</strong>
+                            <small>Track purchases and delivery</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Wishlist" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-heart"></i></span>
+                        <span>
+                            <strong>My collection</strong>
+                            <small>Saved wishlist titles</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Order" asp-action="Cart" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-cart-shopping"></i></span>
+                        <span>
+                            <strong>Shopping cart</strong>
+                            <small>Checkout when you are ready</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Download" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-download"></i></span>
+                        <span>
+                            <strong>Downloads</strong>
+                            <small>Free tracks and previews</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="cv-dash-panel cv-profile-security">
+                <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-shield-halved me-2 text-cv-gold"></i>Security</h2>
+                <a asp-controller="Account" asp-action="ChangePassword" class="btn btn-cv-outline w-100 mb-3">
+                    <i class="fa-solid fa-key me-2"></i>Change password
+                </a>
+                <hr class="cv-profile-divider" />
+                <p class="text-cv-secondary small mb-3">Deactivating your account is permanent for login access.</p>
+                @using (Html.BeginForm("CancelAccount", "Account", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-cv-danger-outline w-100" onclick="return confirm('Deactivate your account?');">
+                        <i class="fa-solid fa-user-slash me-2"></i>Cancel account
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        (function () {
+            var input = document.getElementById('ProfileImageUrl');
+            var img = document.getElementById('cv-profile-avatar-img');
+            var fallback = document.getElementById('cv-profile-avatar-fallback');
+            if (!input || !img || !fallback) return;
+
+            input.addEventListener('input', function () {
+                var url = input.value.trim();
+                if (!url) {
+                    img.classList.add('d-none');
+                    img.removeAttribute('src');
+                    fallback.classList.remove('d-none');
+                    return;
+                }
+                img.src = url;
+                img.classList.remove('d-none');
+                fallback.classList.add('d-none');
+            });
+        })();
+    </script>
+}

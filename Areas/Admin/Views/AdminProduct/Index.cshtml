@@ -1,0 +1,69 @@
+@model PaginatedList<Product>
+@using E_project_DVD_Shop.Helpers
+@{
+    ViewData["Title"] = "Manage Product";
+    ViewData["AdminTitle"] = "Manage Products";
+    const string entityLabel = "product";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+@await Html.PartialAsync("_AdminListFilters")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No products yet. <a asp-action="Create">Add the first product</a>.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.ProductId</span></td>
+                            <td class="text-white-cell">@ProductCatalogHelper.GetTitle(item)</td>
+                            <td><span class="cv-badge-gold">@ProductCatalogHelper.GetMediaType(item)</span></td>
+                            <td class="text-cv-gold fw-semibold">$@item.Price.ToString("N2")</td>
+                            <td>
+                                <span class="@(item.Stock <= 10 ? "text-warning" : "") fw-semibold">@item.Stock</span>
+                            </td>
+                            <td>
+                                @if (item.IsAvailable)
+                                {
+                                    <span class="cv-status cv-status-delivered">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="cv-status cv-status-cancelled">Unavailable</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.ProductId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

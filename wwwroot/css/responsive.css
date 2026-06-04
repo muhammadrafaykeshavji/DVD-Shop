@@ -1,0 +1,541 @@
+/* CineVault — cross-breakpoint responsive fixes (loads after mockup1.css) */
+
+/* ---- Foundation ---- */
+html {
+  overflow-x: clip;
+}
+
+body {
+  overflow-x: clip;
+  max-width: 100vw;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.main-content.container {
+  max-width: min(1400px, 100%);
+  padding-left: clamp(1rem, 3vw, 2rem);
+  padding-right: clamp(1rem, 3vw, 2rem);
+}
+
+.main-content.container-fluid {
+  max-width: 100% !important;
+  width: 100% !important;
+  padding-left: clamp(0.75rem, 2.5vw, 2rem) !important;
+  padding-right: clamp(0.75rem, 2.5vw, 2rem) !important;
+}
+
+/* Member / cart / orders pages — use width, not fixed narrow column */
+.cv-member-dashboard,
+.cv-cart-page,
+.cv-orders-page,
+.cv-profile-page,
+.cv-wishlist-page {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ---- Navbar ---- */
+@media (max-width: 991.98px) {
+  .cv-navbar .navbar-collapse {
+    padding: 0.75rem 0 1rem;
+    border-top: 1px solid var(--cv-navbar-border);
+    margin-top: 0.5rem;
+  }
+
+  .cv-navbar .navbar-nav {
+    gap: 0.25rem;
+  }
+
+  .cv-navbar .btn-cv-outline,
+  .cv-navbar .btn-cv-primary {
+    width: 100%;
+    margin-top: 0.35rem;
+  }
+}
+
+/* ---- Home ---- */
+@media (max-width: 1199.98px) {
+  .cv-hero-content,
+  .cv-home-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .cv-home-band {
+    padding: 2.5rem 0;
+  }
+
+  .cv-home-band.cv-boutique-hero {
+    padding: 3rem 0 3.25rem !important;
+  }
+
+  .cv-boutique-featured-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .cv-boutique-featured-list .cv-boutique-featured-strip {
+    grid-template-columns: 110px 1fr auto !important;
+    gap: 1rem 1.25rem !important;
+    padding: 1.25rem 1.35rem !important;
+    min-height: 0 !important;
+  }
+
+  .cv-boutique-featured-list .cv-boutique-strip-cover,
+  .cv-boutique-featured-list .cv-boutique-strip-cover img {
+    width: 110px !important;
+    max-width: 110px !important;
+    height: 165px !important;
+    max-height: 165px !important;
+  }
+
+  .cv-boutique-spotlight {
+    max-width: 100%;
+    padding: 1.35rem 1.5rem !important;
+  }
+
+  .cv-boutique-spotlight--hero {
+    min-height: 0;
+  }
+
+  .cv-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cv-boutique-title {
+    font-size: clamp(1.75rem, 7vw, 2.25rem);
+  }
+
+  .cv-boutique-lead {
+    max-width: 100%;
+  }
+
+  .cv-boutique-featured-list .cv-boutique-featured-strip {
+    grid-template-columns: 96px 1fr !important;
+    grid-template-rows: auto auto auto;
+  }
+
+  .cv-boutique-featured-list .cv-boutique-featured-strip .btn {
+    grid-column: 1 / -1;
+    justify-self: start;
+    width: 100%;
+    max-width: 14rem;
+  }
+
+  .cv-boutique-featured-list .cv-boutique-strip-cover,
+  .cv-boutique-featured-list .cv-boutique-strip-cover img {
+    width: 96px !important;
+    max-width: 96px !important;
+    height: 144px !important;
+    max-height: 144px !important;
+  }
+
+  .cv-boutique-spotlight--hero .cv-spotlight-inner > [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .cv-boutique-spotlight--hero .cv-boutique-spotlight-art {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .cv-boutique-value-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem;
+  }
+
+  .cv-boutique-carousel .carousel-item .col-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .cv-home-band {
+    padding: 2rem 0;
+  }
+
+  .cv-hero-content,
+  .cv-home-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .cv-boutique-hero .d-flex.flex-wrap.gap-3 {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cv-boutique-hero .d-flex.flex-wrap.gap-3 .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .cv-boutique-value-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ---- Shop ---- */
+@media (max-width: 991.98px) {
+  .cv-shop-page .cv-shop-media-pills {
+    width: 100%;
+  }
+
+  .cv-shop-pill {
+    flex: 1 1 auto;
+    min-width: 4.5rem;
+    text-align: center;
+  }
+
+  .cv-shop-filters-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cv-shop-grid .cv-product-card .cv-card-body {
+    padding: 0.85rem;
+  }
+}
+
+/* ---- Product detail (full-bleed banner) ---- */
+.main-content:has(.cv-product-detail) {
+  overflow-x: clip;
+}
+
+@media (max-width: 991.98px) {
+  .cv-product-banner {
+    padding: 1rem 0 2rem;
+    min-height: 0;
+  }
+
+  .cv-product-banner-inner,
+  .cv-product-detail-body {
+    max-width: 100%;
+    padding-left: clamp(1rem, 3vw, 1.5rem);
+    padding-right: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .cv-product-purchase-card {
+    margin-top: 1.5rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .cv-product-banner-img {
+    width: 200%;
+    height: 180%;
+  }
+
+  .cv-detail-cover {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+}
+
+/* ---- Forum ---- */
+@media (max-width: 991.98px) {
+  .cv-forum-page {
+    max-width: 100%;
+    margin-bottom: 1rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .cv-forum-shell {
+    border-radius: 10px;
+  }
+
+  .cv-discord-forum {
+    height: min(70vh, 600px);
+    max-height: 75vh;
+  }
+
+  /* Sidebar hidden on tablet/phone — use channel tabs + toolbar instead */
+  .cv-forum-page .cv-discord-sidebar {
+    display: none !important;
+  }
+
+  .cv-forum-search {
+    padding: 0.85rem 1rem 0.75rem !important;
+  }
+
+  .cv-qna-forum-list {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .main-content.container-fluid:has(.cv-forum-page) {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .cv-discord-toolbar {
+    padding: 0.75rem !important;
+    flex-wrap: wrap;
+  }
+
+  .cv-discord-toolbar-title h1 {
+    font-size: 0.95rem !important;
+  }
+
+  .cv-news-card-media img {
+    height: 160px;
+  }
+
+  .cv-news-article-body {
+    padding: 1.15rem 1rem 1.25rem;
+  }
+}
+
+/* ---- News ---- */
+@media (max-width: 991.98px) {
+  .cv-news-filters {
+    gap: 0.4rem;
+  }
+
+  .cv-news-pill {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.85rem;
+  }
+}
+
+/* ---- Member dashboard panels ---- */
+@media (max-width: 991.98px) {
+  .cv-dash-hero {
+    padding: 1.35rem 1.25rem;
+  }
+
+  .cv-dash-hero-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cv-dash-hero-actions {
+    width: 100%;
+  }
+
+  .cv-dash-hero-actions .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .cv-dash-panel-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .cv-dash-stat-value {
+    font-size: 1.35rem;
+  }
+
+  .cv-cart-table thead th:nth-child(2),
+  .cv-cart-table tbody td:nth-child(2) {
+    display: none;
+  }
+
+  .cv-cart-product-title {
+    font-size: 0.9rem;
+  }
+}
+
+/* ---- Tables (public + member) ---- */
+@media (max-width: 767.98px) {
+  .table-responsive,
+  .cv-admin-table-wrap,
+  .cv-dash-panel .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cv-table thead th,
+  .cv-dash-table thead th {
+    font-size: 0.68rem;
+    padding: 0.65rem 0.5rem;
+  }
+
+  .cv-table tbody td,
+  .cv-dash-table tbody td {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.88rem;
+  }
+}
+
+/* ---- Footer ---- */
+@media (max-width: 767.98px) {
+  .cv-footer {
+    padding: 2rem 0 1.25rem;
+    text-align: center;
+  }
+
+  .cv-footer .row > [class*="col-"] {
+    margin-bottom: 0.5rem;
+  }
+
+  .cv-footer .social-icon {
+    margin: 0 0.25rem;
+  }
+}
+
+/* ---- Admin sidebar toggle ---- */
+.cv-admin-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.45);
+  z-index: 1040;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar-backdrop {
+  display: block;
+}
+
+@media (min-width: 992px) {
+  .cv-admin-body.cv-admin-sidebar-is-open .cv-admin-sidebar-backdrop {
+    display: none;
+  }
+}
+
+/* Keep off-canvas sidebar on tablet/phone (overrides site.css relative layout) */
+@media (max-width: 991.98px) {
+  .cv-admin-sidebar {
+    position: fixed !important;
+    width: 250px !important;
+    max-width: min(85vw, 280px) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .cv-admin-sidebar-nav {
+    max-height: calc(100vh - var(--cv-admin-header-h, 64px)) !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* ---- Admin ---- */
+@media (max-width: 991.98px) {
+  .cv-admin-body:not(.cv-admin-sidebar-is-open) .cv-admin-topbar,
+  .cv-admin-body:not(.cv-admin-sidebar-is-open) .cv-admin-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .cv-admin-content {
+    padding: 1rem clamp(0.75rem, 3vw, 1.25rem);
+  }
+
+  .cv-admin-page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cv-admin-page-head .btn {
+    width: 100%;
+    max-width: 16rem;
+  }
+
+  .cv-admin-filters-panel .row {
+    row-gap: 0.75rem !important;
+  }
+
+  .cv-admin-filters-panel .col-auto {
+    width: 100%;
+  }
+
+  .cv-admin-filters-panel .col-auto .btn {
+    flex: 1;
+  }
+
+  .cv-admin-alert-tile {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cv-admin-stat-value {
+    font-size: 1.35rem;
+  }
+
+  .cv-admin-chart-panel canvas {
+    max-height: 220px;
+  }
+
+  .cv-admin-table-wrap .cv-col-actions .btn span {
+    display: none !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .cv-admin-topbar {
+    padding: 0.5rem 0.75rem;
+    height: auto;
+    min-height: var(--cv-admin-header-h);
+  }
+
+  .cv-admin-topbar .btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.65rem;
+  }
+}
+
+/* ---- Auth ---- */
+@media (max-width: 575.98px) {
+  .cv-auth-wrap {
+    padding: 1.25rem 1rem;
+  }
+
+  .cv-auth-card {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* ---- Utility: prevent flex/grid blowout ---- */
+.row,
+.d-flex {
+  min-width: 0;
+}
+
+[class*="col-"] {
+  min-width: 0;
+}
+
+.cv-dash-panel,
+.cv-card,
+.cv-order-summary {
+  min-width: 0;
+  max-width: 100%;
+}

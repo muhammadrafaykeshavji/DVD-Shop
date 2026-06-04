@@ -1,0 +1,79 @@
+@using E_project_DVD_Shop.Models
+@{
+    var search = ViewBag.FilterSearch as string ?? "";
+    var mediaType = ViewBag.FilterMediaType as MediaType?;
+    var showMediaFilter = ViewBag.ShowMediaFilter as bool? ?? false;
+    var showAvailability = ViewBag.ShowAvailabilityFilter as bool? ?? false;
+    var availableOnly = ViewBag.FilterAvailableOnly as bool? ?? false;
+    var unavailableOnly = ViewBag.FilterUnavailableOnly as bool? ?? false;
+}
+<form method="get" asp-action="Index" class="cv-admin-filters cv-dash-panel cv-admin-filters-panel mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4 col-lg-5">
+            <label class="form-label small text-cv-secondary mb-1">Search</label>
+            <input type="search" name="search" value="@search" class="form-control" placeholder="Title or artist / studio…" />
+        </div>
+        @if (showMediaFilter)
+        {
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label small text-cv-secondary mb-1">Type</label>
+                <select name="mediaType" class="form-select">
+                    <option value="">All types</option>
+                    @if (mediaType == MediaType.Music)
+                    {
+                        <option value="Music" selected>Music</option>
+                    }
+                    else
+                    {
+                        <option value="Music">Music</option>
+                    }
+                    @if (mediaType == MediaType.Game)
+                    {
+                        <option value="Game" selected>Games</option>
+                    }
+                    else
+                    {
+                        <option value="Game">Games</option>
+                    }
+                    @if (mediaType == MediaType.Movie)
+                    {
+                        <option value="Movie" selected>Movies</option>
+                    }
+                    else
+                    {
+                        <option value="Movie">Movies</option>
+                    }
+                </select>
+            </div>
+        }
+        @if (showAvailability)
+        {
+            <div class="col-md-3 col-lg-2">
+                <label class="form-label small text-cv-secondary mb-1">Availability</label>
+                <select name="available" class="form-select">
+                    <option value="">All</option>
+                    @if (availableOnly)
+                    {
+                        <option value="true" selected>Available only</option>
+                    }
+                    else
+                    {
+                        <option value="true">Available only</option>
+                    }
+                    @if (unavailableOnly)
+                    {
+                        <option value="false" selected>Unavailable only</option>
+                    }
+                    else
+                    {
+                        <option value="false">Unavailable only</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="col-auto d-flex gap-2 flex-wrap">
+            <button type="submit" class="btn btn-cv-primary"><i class="fa-solid fa-filter me-1"></i> Apply</button>
+            <a asp-action="Index" class="btn btn-cv-outline">Clear</a>
+        </div>
+    </div>
+</form>

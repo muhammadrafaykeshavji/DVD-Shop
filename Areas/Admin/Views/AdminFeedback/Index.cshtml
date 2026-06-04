@@ -1,0 +1,60 @@
+@model PaginatedList<Feedback>
+@{
+    ViewData["Title"] = "Feedback";
+    ViewData["AdminTitle"] = "Customer Feedback";
+    ViewData["ShowAddButton"] = false;
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Message</th>
+                    <th>Reply</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="cv-table-empty">
+                            <i class="fa-solid fa-comment fa-2x mb-2 d-block opacity-50"></i>
+                            No feedback messages yet.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var f in Model)
+                    {
+                        <tr>
+                            <td class="text-white-cell">@f.User?.UserName</td>
+                            <td>@f.Message</td>
+                            <td>@(string.IsNullOrWhiteSpace(f.AdminReply) ? "—" : f.AdminReply)</td>
+                            <td class="text-end">
+                                <div class="cv-table-actions">
+                                    <a asp-action="Reply" asp-route-id="@f.FeedbackId" class="btn btn-sm btn-cv-primary py-1 px-2" title="Reply">
+                                        <i class="fa-solid fa-reply"></i><span class="d-none d-xl-inline ms-1">Reply</span>
+                                    </a>
+                                    <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this feedback?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@f.FeedbackId" />
+                                        <button type="submit" class="btn btn-sm btn-cv-danger-outline" title="Delete">
+                                            <i class="fa-solid fa-trash"></i><span class="d-none d-xl-inline ms-1">Delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

@@ -1,0 +1,54 @@
+@model PaginatedList<Category>
+@{
+    ViewData["Title"] = "Categories";
+    ViewData["AdminTitle"] = "Manage Categories";
+    const string entityLabel = "category";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<p class="text-cv-secondary small mb-3">
+    <i class="fa-solid fa-circle-info text-cv-gold me-1"></i>
+    Genres only (Pop, Rock, Action &amp; RPG, etc.). Shoppers filter <strong>Music / Games / Movies</strong> using media type on the shop page, not these rows.
+</p>
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No categories yet. <a asp-action="Create">Add the first category</a>.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.CategoryId</span></td>
+                            <td class="text-white-cell">@item.Name</td>
+                            <td>@item.Description</td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.CategoryId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

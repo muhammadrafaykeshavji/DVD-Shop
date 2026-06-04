@@ -1,0 +1,9 @@
+@{
+    var saveLabel = ViewData["SaveLabel"] as string ?? "Save";
+}
+<div class="cv-admin-form-footer d-flex flex-wrap align-items-center gap-2 pt-4 mt-1 border-top">
+    <button type="submit" class="btn btn-cv-primary">
+        <i class="fa-solid fa-check me-1"></i>@saveLabel
+    </button>
+    <a asp-action="Index" class="btn btn-cv-outline">Cancel</a>
+</div>

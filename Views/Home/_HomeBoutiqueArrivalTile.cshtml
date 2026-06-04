@@ -1,0 +1,27 @@
+@using E_project_DVD_Shop.Helpers
+@using E_project_DVD_Shop.Models
+@model Product
+@{
+    var cover = ProductCatalogHelper.GetCoverUrl(Model) ?? "/images/placeholder-album.svg";
+    var title = ProductCatalogHelper.GetTitle(Model);
+    var credit = ProductCatalogHelper.GetCreditName(Model);
+    var media = ProductCatalogHelper.GetMediaType(Model);
+    var tagClass = media switch
+    {
+        MediaType.Game => "cv-arrival-tag--game",
+        MediaType.Movie => "cv-arrival-tag--movie",
+        _ => "cv-arrival-tag--music"
+    };
+}
+<a asp-controller="Product" asp-action="Details" asp-route-id="@Model.ProductId" class="cv-boutique-arrival-tile">
+    <div class="cv-boutique-arrival-thumb">
+        <img src="@cover" alt="@title" loading="lazy"
+             onerror="this.onerror=null;this.src='/images/placeholder-album.svg';" />
+        <span class="cv-arrival-tag @tagClass">@media</span>
+    </div>
+    <div class="cv-boutique-arrival-info">
+        <h6 class="mb-0">@title</h6>
+        <p class="mb-0">@credit</p>
+        <span class="cv-boutique-arrival-price">$@Model.Price.ToString("F2")</span>
+    </div>
+</a>

@@ -1,0 +1,114 @@
+@model ReportViewModel
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<div class="cv-admin-dashboard">
+    <section class="cv-dash-hero cv-admin-dash-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-chart-line me-1"></i> Analytics</p>
+                <h1 class="cv-dash-title">Sales &amp; user reports</h1>
+                <p class="cv-dash-sub mb-0">Revenue overview and top-performing products.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+                <span class="cv-dash-stat-value">$@Model.TotalSales.ToString("F2")</span>
+                <span class="cv-dash-stat-label">Total sales</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-receipt"></i></span>
+                <span class="cv-dash-stat-value">@Model.OrdersToday / @Model.TotalOrders</span>
+                <span class="cv-dash-stat-label">Orders today / total</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-user-plus"></i></span>
+                <span class="cv-dash-stat-value">@Model.NewUsersLast30Days</span>
+                <span class="cv-dash-stat-label">New users (30 days)</span>
+                <small class="cv-admin-stat-meta">@Model.TotalUsers total members</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="cv-dash-panel cv-admin-chart-panel mb-4">
+        <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-chart-column me-2 text-cv-gold"></i>Sales overview</h2>
+        <canvas id="reportChart" height="100"></canvas>
+    </div>
+
+    <div class="cv-dash-panel">
+        <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-trophy me-2 text-cv-gold"></i>Top products</h2>
+        <div class="table-responsive">
+            <table class="table cv-table cv-dash-table cv-admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Units sold</th>
+                        <th class="text-end">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.TopProducts.Any())
+                    {
+                        <tr>
+                            <td colspan="3" class="cv-table-empty">No sales data yet.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var p in Model.TopProducts)
+                        {
+                            <tr>
+                                <td class="text-white-cell fw-semibold">@p.Title</td>
+                                <td class="text-cv-secondary">@p.UnitsSold</td>
+                                <td class="text-cv-gold fw-semibold text-end">$@p.Revenue.ToString("N2")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const chartTick = '#71717a';
+    const chartGrid = '#e4e4e7';
+    const chartLegend = '#52525b';
+    new Chart(document.getElementById('reportChart'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProducts.Select(p => p.Title).ToList())),
+            datasets: [{
+                label: 'Revenue',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.TopProducts.Select(p => (double)p.Revenue).ToList())),
+                backgroundColor: 'rgba(232, 168, 23, 0.55)',
+                borderColor: '#e8a817',
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: chartLegend } } },
+            scales: {
+                x: { ticks: { color: chartTick }, grid: { color: chartGrid } },
+                y: {
+                    ticks: { color: chartTick, callback: v => '$' + v },
+                    grid: { color: chartGrid },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+}

@@ -1,0 +1,23 @@
+@model Artist
+@{
+    ViewData["Title"] = "Edit Artist";
+    ViewData["FormTitle"] = $"Edit Artist — {Model.Name}";
+    ViewData["FormIcon"] = "fa-microphone";
+    ViewData["SaveLabel"] = "Update Artist";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ArtistId" />
+        <div asp-validation-summary="ModelOnly"></div>
+        @await Html.PartialAsync("_Form", Model)
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}

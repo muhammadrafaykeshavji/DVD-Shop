@@ -1,0 +1,40 @@
+@model ForumQuestionInput
+@{
+    ViewData["Title"] = "Ask a question";
+    ViewData["ChannelTitle"] = "New question";
+    ViewData["ChannelIcon"] = "fa-circle-question";
+}
+
+<div class="cv-forum-ask-wrap">
+    <div class="cv-dash-panel cv-forum-ask-panel">
+        <h2 class="cv-dash-panel-title mb-2"><i class="fa-solid fa-circle-question me-2 text-cv-gold"></i>Ask the team</h2>
+        <p class="text-cv-secondary small mb-4">
+            An admin will reply in your thread. For casual chat, use
+            <a asp-action="General" class="text-cv-gold fw-semibold">#general</a>.
+        </p>
+        <form asp-action="Ask" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label">Question title</label>
+                <input asp-for="Title" class="form-control" placeholder="e.g. Do you ship internationally?" autofocus />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Content" class="form-label">Details</label>
+                <textarea asp-for="Content" class="form-control" rows="5"
+                          placeholder="Add any details that will help the team answer…"></textarea>
+                <span asp-validation-for="Content" class="text-danger small"></span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-cv-primary">
+                    <i class="fa-solid fa-paper-plane me-1"></i> Post question
+                </button>
+                <a asp-action="Qna" class="btn btn-cv-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,0 +1,48 @@
+@model News
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="cv-member-dashboard cv-news-detail-page">
+    <nav class="cv-news-breadcrumb" aria-label="Breadcrumb">
+        <a asp-action="Index" class="cv-admin-back-link"><i class="fa-solid fa-arrow-left me-1"></i> All news</a>
+        @if (!string.IsNullOrEmpty(Model.Category))
+        {
+            <span class="cv-news-breadcrumb-sep" aria-hidden="true">/</span>
+            <a asp-action="Index" asp-route-category="@Model.Category" class="text-cv-gold fw-semibold small">
+                @NewsCategories.GetDisplayName(Model.Category)
+            </a>
+        }
+    </nav>
+
+    <article class="cv-dash-panel cv-news-article">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="cv-news-article-hero">
+                <img src="@Model.ImageUrl" alt="" loading="lazy" />
+            </div>
+        }
+        <div class="cv-news-article-body">
+            <div class="cv-news-card-meta mb-2">
+                <span class="cv-news-category">@NewsCategories.GetDisplayName(Model.Category)</span>
+                @if (!string.IsNullOrEmpty(Model.SourceName))
+                {
+                    <span class="cv-news-source">via @Model.SourceName</span>
+                }
+            </div>
+            <h1 class="cv-news-article-title">@Model.Title</h1>
+            <p class="cv-news-article-date text-cv-secondary small mb-4">
+                <i class="fa-regular fa-calendar me-1"></i>@Model.CreatedDate.ToString("MMMM d, yyyy")
+            </p>
+            <div class="cv-news-article-content">@Model.Content</div>
+            @if (!string.IsNullOrEmpty(Model.SourceUrl))
+            {
+                <div class="cv-news-article-actions mt-4 pt-3 border-top">
+                    <a href="@Model.SourceUrl" class="btn btn-cv-primary" target="_blank" rel="noopener noreferrer">
+                        Read full article <i class="fa-solid fa-arrow-up-right-from-square ms-2"></i>
+                    </a>
+                </div>
+            }
+        </div>
+    </article>
+</div>

@@ -1,0 +1,24 @@
+@model FilmStudio
+@{
+    ViewData["Title"] = "Edit Film Studio";
+    ViewData["FormTitle"] = "Edit Film Studio";
+    ViewData["FormIcon"] = "fa-film";
+    ViewData["SaveLabel"] = "Save";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="FilmStudioId" />
+        <div asp-validation-summary="ModelOnly"></div>
+        @await Html.PartialAsync("_Form", Model)
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}
+

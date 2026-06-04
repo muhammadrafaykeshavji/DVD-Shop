@@ -1,0 +1,75 @@
+@model PaginatedList<ApplicationUser>
+@{
+    ViewData["Title"] = "Administrators";
+    ViewData["AdminTitle"] = "Administrators";
+    ViewData["AddAction"] = "Create";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="cv-table-empty">No administrators found.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var u in Model)
+                    {
+                        <tr>
+                            <td class="text-white-cell">@u.UserName</td>
+                            <td>@u.Email</td>
+                            <td>
+                                @if (u.IsActive)
+                                {
+                                    <span class="cv-status cv-status-delivered">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="cv-status cv-status-cancelled">Inactive</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="cv-table-actions">
+                                    @if (!u.IsActive)
+                                    {
+                                        <form asp-action="Recover" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@u.Id" />
+                                            <button type="submit" class="btn btn-sm btn-cv-outline" title="Recover administrator">
+                                                <i class="fa-solid fa-rotate-left"></i><span class="d-none d-xl-inline ms-1">Recover</span>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Deactivate this administrator?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@u.Id" />
+                                            <button type="submit" class="btn btn-sm btn-cv-danger-outline" title="Deactivate">
+                                                <i class="fa-solid fa-user-slash"></i><span class="d-none d-xl-inline ms-1">Deactivate</span>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

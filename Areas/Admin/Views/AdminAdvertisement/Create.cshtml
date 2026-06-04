@@ -1,0 +1,22 @@
+@model Advertisement
+@{
+    ViewData["Title"] = "Create Banner";
+    ViewData["FormTitle"] = "Add Banner";
+    ViewData["FormIcon"] = "fa-image";
+    ViewData["SaveLabel"] = "Create Banner";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card cv-admin-form-wide">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly"></div>
+        @await Html.PartialAsync("_Form", Model)
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}

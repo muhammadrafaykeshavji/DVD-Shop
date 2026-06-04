@@ -1,0 +1,154 @@
+@model DashboardViewModel
+@using E_project_DVD_Shop.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    var userName = User.Identity?.Name ?? "Member";
+    string StatusClass(OrderStatus s) => s switch
+    {
+        OrderStatus.Pending or OrderStatus.Processing => "cv-status-pending",
+        OrderStatus.Shipped => "cv-status-shipped",
+        OrderStatus.Delivered => "cv-status-delivered",
+        _ => "cv-status-cancelled"
+    };
+}
+
+<div class="cv-member-dashboard">
+    <section class="cv-dash-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-gauge-high me-1"></i> Member dashboard</p>
+                <h1 class="cv-dash-title">Welcome back, @userName</h1>
+                <p class="cv-dash-sub">Track orders, manage your balance, and jump back into the vault.</p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                    <i class="fa-solid fa-compact-disc me-2"></i>Browse Shop
+                </a>
+                <a asp-controller="Account" asp-action="Profile" class="btn btn-cv-outline">
+                    <i class="fa-solid fa-user-pen me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3 cv-dash-stats mb-4">
+        <div class="col-6 col-lg-3">
+            <a asp-controller="Order" asp-action="MyOrders" class="cv-dash-stat cv-dash-stat--link">
+                <span class="cv-dash-stat-icon" aria-hidden="true"><i class="fa-solid fa-box"></i></span>
+                <span class="cv-dash-stat-value">@Model.TotalOrders</span>
+                <span class="cv-dash-stat-label">Total orders</span>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="cv-dash-stat">
+                <span class="cv-dash-stat-icon" aria-hidden="true"><i class="fa-solid fa-wallet"></i></span>
+                <span class="cv-dash-stat-value">$@Model.Balance.ToString("F2")</span>
+                <span class="cv-dash-stat-label">Wallet balance</span>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a asp-controller="Wishlist" asp-action="Index" class="cv-dash-stat cv-dash-stat--link">
+                <span class="cv-dash-stat-icon" aria-hidden="true"><i class="fa-solid fa-heart"></i></span>
+                <span class="cv-dash-stat-value">@Model.WishlistCount</span>
+                <span class="cv-dash-stat-label">Wishlist items</span>
+            </a>
+        </div>
+        <div class="col-6 col-lg-3">
+            <a asp-controller="Download" asp-action="Index" class="cv-dash-stat cv-dash-stat--link">
+                <span class="cv-dash-stat-icon" aria-hidden="true"><i class="fa-solid fa-download"></i></span>
+                <span class="cv-dash-stat-value"><i class="fa-solid fa-music cv-dash-stat-music"></i></span>
+                <span class="cv-dash-stat-label">Free downloads</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="cv-dash-panel">
+                <div class="cv-dash-panel-head">
+                    <h2 class="cv-dash-panel-title"><i class="fa-solid fa-clock-rotate-left me-2 text-cv-gold"></i>Recent orders</h2>
+                    @if (Model.RecentOrders.Any())
+                    {
+                        <a asp-controller="Order" asp-action="MyOrders" class="cv-dash-panel-link">View all <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                    }
+                </div>
+                @if (!Model.RecentOrders.Any())
+                {
+                    <div class="cv-dash-empty">
+                        <i class="fa-solid fa-bag-shopping cv-dash-empty-icon" aria-hidden="true"></i>
+                        <p class="mb-3 text-cv-secondary">You have not placed any orders yet.</p>
+                        <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary btn-sm">Start shopping</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table cv-table cv-dash-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in Model.RecentOrders)
+                                {
+                                    <tr class="cv-dash-order-row" onclick="window.location='@Url.Action("Details", "Order", new { id = o.OrderId })'">
+                                        <td class="text-white-cell fw-semibold">
+                                            <a asp-controller="Order" asp-action="Details" asp-route-id="@o.OrderId" class="text-cv-gold" onclick="event.stopPropagation();">#@o.OrderId</a>
+                                        </td>
+                                        <td class="text-cv-secondary">@o.OrderDate.ToString("MMM d, yyyy")</td>
+                                        <td class="text-cv-gold fw-semibold">$@o.TotalAmount.ToString("F2")</td>
+                                        <td><span class="cv-status @StatusClass(o.Status)">@o.Status</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="cv-dash-panel cv-dash-panel--sidebar">
+                <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-bolt me-2 text-cv-gold"></i>Quick links</h2>
+                <nav class="cv-dash-links">
+                    <a asp-controller="Order" asp-action="Cart" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-cart-shopping"></i></span>
+                        <span>
+                            <strong>Shopping cart</strong>
+                            <small>Review items before checkout</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Wishlist" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-heart"></i></span>
+                        <span>
+                            <strong>Wishlist</strong>
+                            <small>@Model.WishlistCount saved @(Model.WishlistCount == 1 ? "title" : "titles")</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Download" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-download"></i></span>
+                        <span>
+                            <strong>Downloads</strong>
+                            <small>Free tracks and previews</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Forum" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-comments"></i></span>
+                        <span>
+                            <strong>Community forum</strong>
+                            <small>Chat and Q&amp;A with collectors</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

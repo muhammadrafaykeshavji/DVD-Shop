@@ -1,0 +1,84 @@
+@model ForumPost
+@using E_project_DVD_Shop.Helpers
+@{
+    ViewData["Title"] = Model.Title;
+    ViewData["ChannelTitle"] = Model.Title;
+    ViewData["ChannelIcon"] = "fa-circle-question";
+    var answers = Model.Replies.OrderBy(x => x.CreatedDate).ToList();
+}
+
+<div class="cv-discord-messages cv-discord-messages--qna" id="qnaThread">
+    @{
+        ViewData["IsStarter"] = true;
+        ViewData["StarterLabel"] = "Question";
+    }
+    @await Html.PartialAsync("_ForumMessage", Model)
+
+    @if (answers.Any())
+    {
+        <div class="cv-discord-qna-divider">
+            <span><i class="fa-solid fa-shield-halved me-1"></i> Admin answers</span>
+        </div>
+        @foreach (var answer in answers)
+        {
+            ViewData["IsStarter"] = false;
+            ViewData["StarterLabel"] = null;
+            ViewData["IsAdminAnswer"] = true;
+            @await Html.PartialAsync("_ForumMessage", answer)
+        }
+    }
+    else
+    {
+        <p class="cv-discord-qna-waiting text-cv-secondary px-3 py-2">
+            <i class="fa-solid fa-hourglass-half me-1"></i> Waiting for an admin to answer.
+        </p>
+    }
+</div>
+
+<footer class="cv-discord-composer">
+    @if (User.IsInRole("Admin"))
+    {
+        <form asp-action="Answer" method="post" class="cv-discord-compose-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="QuestionId" value="@Model.PostId" />
+            <div class="cv-discord-compose-inner cv-discord-compose-inner--admin">
+                <span class="cv-discord-admin-label"><i class="fa-solid fa-shield-halved"></i></span>
+                <textarea name="Content" class="form-control cv-discord-compose-input" rows="1"
+                          placeholder="Write an official answer…" required maxlength="4000"></textarea>
+                <button type="submit" class="btn btn-cv-primary cv-discord-send" title="Post answer">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    }
+    else if (User.IsInRole("Member"))
+    {
+        <div class="cv-discord-compose-guest">
+            <span class="text-cv-secondary">Only admins can post answers here. </span>
+            <a asp-action="Ask" class="text-cv-gold fw-semibold">Ask a new question</a>
+        </div>
+    }
+    else
+    {
+        <div class="cv-discord-compose-guest">
+            <a asp-controller="Account" asp-action="Login" class="text-cv-gold fw-semibold">Sign in</a>
+            <span class="text-cv-secondary"> to ask questions.</span>
+        </div>
+    }
+</footer>
+
+@section Scripts {
+    <script>
+        (() => {
+            const box = document.getElementById("qnaThread");
+            if (box) box.scrollTop = box.scrollHeight;
+            const input = document.querySelector(".cv-discord-compose-input");
+            if (input) {
+                input.addEventListener("input", () => {
+                    input.style.height = "auto";
+                    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+                });
+            }
+        })();
+    </script>
+}

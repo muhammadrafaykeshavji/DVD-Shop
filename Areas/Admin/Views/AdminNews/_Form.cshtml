@@ -1,0 +1,41 @@
+@model News
+<div class="row g-4">
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" placeholder="Headline" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Category" class="form-label">Industry</label>
+        <select asp-for="Category" class="form-select">
+            <option value="">— Select —</option>
+            @foreach (var (value, label) in NewsCategories.Filters)
+            {
+                <option value="@value">@label</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Type" class="form-label"></label>
+        <select asp-for="Type" class="form-select" asp-items="Html.GetEnumSelectList<NewsType>()"></select>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check form-switch mb-2">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label">Published</label>
+        </div>
+    </div>
+    <div class="col-12">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" class="form-control" rows="8" placeholder="Article body…"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+    <div class="col-md-8">
+        <label asp-for="SourceUrl" class="form-label">Source URL</label>
+        <input asp-for="SourceUrl" class="form-control" placeholder="https://… (optional, for external articles)" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="SourceName" class="form-label">Source name</label>
+        <input asp-for="SourceName" class="form-control" placeholder="e.g. IGN" />
+    </div>
+</div>

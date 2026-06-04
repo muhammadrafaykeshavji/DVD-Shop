@@ -1,0 +1,10 @@
+@model Order
+@{ ViewData["Title"] = $"Order #{Model.OrderId}"; }
+<h2>Order #@Model.OrderId</h2>
+<p>Date: @Model.OrderDate | Status: @Model.Status | Total: $@Model.TotalAmount.ToString("F2")</p>
+<table class="table"><thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th></tr></thead>
+<tbody>
+@foreach (var i in Model.OrderItems) {
+<tr><td>@E_project_DVD_Shop.Helpers.ProductCatalogHelper.GetTitle(i.Product)</td><td>@i.Quantity</td><td>$@i.UnitPrice.ToString("F2")</td></tr>
+}
+</tbody></table>

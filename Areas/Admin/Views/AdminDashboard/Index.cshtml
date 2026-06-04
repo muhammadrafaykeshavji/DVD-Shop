@@ -1,0 +1,330 @@
+@model AdminDashboardViewModel
+@using E_project_DVD_Shop.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    string StatusClass(OrderStatus s) => s switch
+    {
+        OrderStatus.Pending or OrderStatus.Processing => "cv-status-pending",
+        OrderStatus.Shipped => "cv-status-shipped",
+        OrderStatus.Delivered => "cv-status-delivered",
+        _ => "cv-status-cancelled"
+    };
+    var chartLabels = string.Join(",", Model.MonthlySales.Select(m => $"'{m.Label}'"));
+    var chartData = string.Join(",", Model.MonthlySales.Select(m => m.Amount.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+    var statusLabels = string.Join(",", Model.OrderStatusCounts.Select(s => $"'{s.Status}'"));
+    var statusData = string.Join(",", Model.OrderStatusCounts.Select(s => s.Count));
+}
+
+<div class="cv-admin-dashboard">
+    <section class="cv-dash-hero cv-admin-dash-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-gauge-high me-1"></i> Administration</p>
+                <h1 class="cv-dash-title">Admin Dashboard</h1>
+                <p class="cv-dash-sub mb-0">Overview of sales, orders, inventory, and activity.</p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Create" class="btn btn-cv-primary btn-sm">
+                    <i class="fa-solid fa-plus me-1"></i>Add product
+                </a>
+                <a asp-area="Admin" asp-controller="AdminOrder" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                    <i class="fa-solid fa-receipt me-1"></i>Orders
+                </a>
+                <a asp-area="Admin" asp-controller="AdminReport" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                    <i class="fa-solid fa-chart-line me-1"></i>Reports
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-xl-3">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+                <span class="cv-dash-stat-value">$@Model.TotalSales.ToString("N2")</span>
+                <span class="cv-dash-stat-label">Total sales (all time)</span>
+                <small class="cv-admin-stat-meta">$@Model.SalesThisMonth.ToString("N2") this month</small>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-receipt"></i></span>
+                <span class="cv-dash-stat-value">@Model.TotalOrders</span>
+                <span class="cv-dash-stat-label">Total orders</span>
+                <small class="cv-admin-stat-meta text-cv-gold">@Model.OrdersToday today · avg $@Model.AverageOrderValue.ToString("N2")</small>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-users"></i></span>
+                <span class="cv-dash-stat-value">@Model.TotalUsers</span>
+                <span class="cv-dash-stat-label">Active users</span>
+                <small class="cv-admin-stat-meta text-cv-gold">+@Model.NewUsersLast30Days in last 30 days</small>
+            </div>
+        </div>
+        <div class="col-6 col-xl-3">
+            <div class="cv-dash-stat cv-admin-stat">
+                <span class="cv-dash-stat-icon"><i class="fa-solid fa-box"></i></span>
+                <span class="cv-dash-stat-value">@Model.TotalProducts</span>
+                <span class="cv-dash-stat-label">Products listed</span>
+                <small class="cv-admin-stat-meta text-danger">@Model.LowStockCount low stock (≤10)</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <a asp-area="Admin" asp-controller="AdminFeedback" asp-action="Index" class="cv-admin-alert-tile">
+                <span class="cv-admin-alert-icon"><i class="fa-solid fa-comment-dots"></i></span>
+                <span class="cv-admin-alert-text">
+                    <strong>Pending feedback</strong>
+                    <small>Messages awaiting reply</small>
+                </span>
+                <span class="cv-admin-alert-count">@Model.PendingFeedbackCount</span>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a asp-area="Admin" asp-controller="AdminReview" asp-action="Index" class="cv-admin-alert-tile">
+                <span class="cv-admin-alert-icon"><i class="fa-solid fa-star"></i></span>
+                <span class="cv-admin-alert-text">
+                    <strong>Total reviews</strong>
+                    <small>Customer product reviews</small>
+                </span>
+                <span class="cv-admin-alert-count">@Model.PendingReviewsCount</span>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Index" class="cv-admin-alert-tile">
+                <span class="cv-admin-alert-icon cv-admin-alert-icon--warn"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                <span class="cv-admin-alert-text">
+                    <strong>Low stock</strong>
+                    <small>Products need restocking</small>
+                </span>
+                <span class="cv-admin-alert-count">@Model.LowStockCount</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="cv-dash-panel cv-admin-chart-panel">
+                <h2 class="cv-dash-panel-title mb-1"><i class="fa-solid fa-chart-line me-2 text-cv-gold"></i>Monthly sales (@DateTime.UtcNow.Year)</h2>
+                <p class="text-cv-secondary small mb-3">Revenue from completed orders by month</p>
+                <canvas id="salesChart" height="110"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="cv-dash-panel cv-admin-chart-panel h-100">
+                <h2 class="cv-dash-panel-title mb-1"><i class="fa-solid fa-chart-pie me-2 text-cv-gold"></i>Orders by status</h2>
+                <p class="text-cv-secondary small mb-3">Current order pipeline</p>
+                <canvas id="statusChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="cv-dash-panel">
+                <div class="cv-dash-panel-head">
+                    <h2 class="cv-dash-panel-title mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-cv-gold"></i>Recent orders</h2>
+                    <a asp-area="Admin" asp-controller="AdminOrder" asp-action="Index" class="cv-dash-panel-link">View all <i class="fa-solid fa-arrow-right ms-1"></i></a>
+                </div>
+                @if (!Model.RecentOrders.Any())
+                {
+                    <p class="text-cv-secondary mb-0">No orders yet. Sales data will appear here after customers checkout.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table cv-table cv-dash-table cv-admin-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="cv-col-id">#</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in Model.RecentOrders)
+                                {
+                                    <tr>
+                                        <td><span class="cv-id-badge">@o.OrderId</span></td>
+                                        <td class="text-white-cell fw-semibold">@o.User?.UserName</td>
+                                        <td class="text-cv-secondary">@o.OrderDate.ToString("MMM d, yyyy")</td>
+                                        <td class="text-cv-gold fw-semibold">$@o.TotalAmount.ToString("N2")</td>
+                                        <td><span class="cv-status @StatusClass(o.Status)">@o.Status</span></td>
+                                        <td class="text-end">
+                                            <a asp-area="Admin" asp-controller="AdminOrder" asp-action="Edit" asp-route-id="@o.OrderId" class="btn btn-sm btn-cv-outline" title="View order">
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="cv-dash-panel h-100">
+                <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-trophy me-2 text-cv-gold"></i>Top products</h2>
+                @if (!Model.TopProducts.Any())
+                {
+                    <p class="text-cv-secondary small mb-0">No sales yet.</p>
+                }
+                else
+                {
+                    var rank = 1;
+                    foreach (var p in Model.TopProducts)
+                    {
+                        <div class="cv-admin-top-product">
+                            <div>
+                                <span class="text-cv-gold fw-bold me-1">#@rank</span>
+                                <span class="fw-semibold">@p.Title</span>
+                                <br /><small class="text-cv-secondary">@p.UnitsSold units sold</small>
+                            </div>
+                            <span class="text-cv-gold fw-semibold">$@p.Revenue.ToString("N2")</span>
+                        </div>
+                        rank++;
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="cv-dash-panel mb-4">
+        <div class="cv-dash-panel-head">
+            <h2 class="cv-dash-panel-title mb-0"><i class="fa-solid fa-boxes-stacked me-2 text-cv-gold"></i>Low stock alert (≤ 10 units)</h2>
+            <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Index" class="cv-dash-panel-link">Manage products <i class="fa-solid fa-arrow-right ms-1"></i></a>
+        </div>
+        @if (!Model.LowStockProducts.Any())
+        {
+            <p class="text-cv-secondary mb-0">All products have healthy stock levels.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table cv-table cv-dash-table cv-admin-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Stock</th>
+                            <th class="text-end"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.LowStockProducts)
+                        {
+                            <tr>
+                                <td class="text-white-cell fw-semibold">@p.Title</td>
+                                <td>
+                                    <span class="@(p.Stock == 0 ? "text-danger" : "text-warning") fw-semibold">@p.Stock</span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-area="Admin" asp-controller="AdminProduct" asp-action="Edit" asp-route-id="@p.ProductId" class="btn btn-sm btn-cv-outline" title="Restock">
+                                        <i class="fa-solid fa-boxes-stacked"></i><span class="d-none d-md-inline ms-1">Restock</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="row g-2 cv-admin-quick-links">
+        <div class="col-6 col-md-3">
+            <a asp-area="Admin" asp-controller="AdminUser" asp-action="Index" class="cv-dash-link-tile">
+                <span class="cv-dash-link-icon"><i class="fa-solid fa-users"></i></span>
+                <span><strong>Users</strong></span>
+                <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a asp-area="Admin" asp-controller="AdminNews" asp-action="Index" class="cv-dash-link-tile">
+                <span class="cv-dash-link-icon"><i class="fa-solid fa-newspaper"></i></span>
+                <span><strong>News</strong></span>
+                <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a asp-area="Admin" asp-controller="AdminPromotion" asp-action="Index" class="cv-dash-link-tile">
+                <span class="cv-dash-link-icon"><i class="fa-solid fa-percent"></i></span>
+                <span><strong>Promotions</strong></span>
+                <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a asp-area="Admin" asp-controller="AdminAdvertisement" asp-action="Index" class="cv-dash-link-tile">
+                <span class="cv-dash-link-icon"><i class="fa-solid fa-image"></i></span>
+                <span><strong>Banners</strong></span>
+                <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const chartTick = '#71717a';
+    const chartGrid = '#e4e4e7';
+    const chartLegend = '#52525b';
+
+    const salesCtx = document.getElementById('salesChart');
+    if (salesCtx) {
+        new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: [@Html.Raw(chartLabels)],
+                datasets: [{
+                    label: 'Sales ($)',
+                    data: [@Html.Raw(chartData)],
+                    borderColor: '#e8a817',
+                    backgroundColor: 'rgba(232, 168, 23, 0.15)',
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#e8a817',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { labels: { color: chartLegend } } },
+                scales: {
+                    x: { ticks: { color: chartTick }, grid: { color: chartGrid } },
+                    y: {
+                        ticks: { color: chartTick, callback: v => '$' + v },
+                        grid: { color: chartGrid },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [@Html.Raw(statusLabels)],
+                datasets: [{
+                    data: [@Html.Raw(statusData)],
+                    backgroundColor: ['#e8a817', '#3498db', '#2ecc71', '#e74c3c', '#a1a1aa'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { color: chartLegend, boxWidth: 12 } } }
+            }
+        });
+    }
+</script>
+}

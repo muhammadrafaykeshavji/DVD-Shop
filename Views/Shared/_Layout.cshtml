@@ -1,0 +1,144 @@
+@using E_project_DVD_Shop.Services
+@inject CartService CartService
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var isAuthPage = controller == "Account" && (action == "Login" || action == "Register");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CineVault</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mockup1.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+</head>
+<body class="@(isAuthPage ? "cv-auth-body" : "")">
+    <header>
+        <nav class="navbar navbar-expand-lg cv-navbar sticky-top">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <span class="logo-icon">◈</span> CineVault
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navMain">
+                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Home" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Product" ? "active" : "")" asp-controller="Product" asp-action="Index">Shop</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "News" ? "active" : "")" asp-controller="News" asp-action="Index">News</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(controller == "Forum" ? "active" : "")" asp-controller="Forum" asp-action="Index">Forum</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav align-items-lg-center gap-lg-2">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Order" asp-action="Cart">
+                                    <i class="fa-solid fa-cart-shopping"></i> (@CartService.GetItemCount())
+                                </a>
+                            </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-cv-gold fw-semibold" asp-area="Admin" asp-controller="AdminDashboard" asp-action="Index">
+                                        <i class="fa-solid fa-shield-halved"></i> Admin Panel
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-cv-gold" href="#" data-bs-toggle="dropdown">
+                                    @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Dashboard"><i class="fa-solid fa-gauge me-2"></i>Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fa-solid fa-user me-2"></i>Profile</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Order" asp-action="MyOrders"><i class="fa-solid fa-box me-2"></i>Orders</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Wishlist" asp-action="Index"><i class="fa-solid fa-heart me-2"></i>Wishlist</a></li>
+                                    <li><hr class="dropdown-divider" style="border-color: var(--cv-card-border);" /></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item"><i class="fa-solid fa-right-from-bracket me-2"></i>Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-cv-outline btn-sm" asp-controller="Account" asp-action="Login">Sign In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-cv-primary btn-sm" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="@(ViewData["FullWidth"] as bool? == true ? "container-fluid px-4" : "container") main-content">
+        <main role="main">@RenderBody()</main>
+    </div>
+
+    @await Html.PartialAsync("_Alerts")
+
+    @if (!isAuthPage)
+    {
+        <footer class="cv-footer">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <h6>◈ About CineVault</h6>
+                        <p class="text-cv-secondary small">Your premium destination for Music, Games, and Movie DVDs. Discover, preview, and collect the titles you love.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Quick Links</h6>
+                        <ul class="list-unstyled small">
+                            <li><a asp-controller="Product" asp-action="Index">Browse Shop</a></li>
+                            <li><a asp-controller="News" asp-action="Index">All Industry News</a></li>
+                            <li><a asp-controller="News" asp-action="Index" asp-route-category="@NewsCategories.Gaming">Gaming Industry</a></li>
+                            <li><a asp-controller="News" asp-action="Index" asp-route-category="@NewsCategories.Music">Music Industry</a></li>
+                            <li><a asp-controller="News" asp-action="Index" asp-route-category="@NewsCategories.Film">Film Industry</a></li>
+                            <li><a asp-controller="Forum" asp-action="Index">Community Forum</a></li>
+                            <li><a asp-controller="Account" asp-action="Register">Create Account</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Connect</h6>
+                        <div>
+                            <a href="#" class="social-icon" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" class="social-icon" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                            <a href="#" class="social-icon" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="#" class="social-icon" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <hr style="border-color: var(--cv-navbar-border); margin: 2rem 0 1rem;" />
+                <p class="text-center text-cv-muted small mb-0">&copy; @DateTime.Now.Year CineVault — Online DVD Shop</p>
+            </div>
+        </footer>
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

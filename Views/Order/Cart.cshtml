@@ -1,0 +1,142 @@
+@model List<CartItem>
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var subtotal = (decimal)(ViewBag.Subtotal ?? 0m);
+    var discount = (decimal)(ViewBag.Discount ?? 0m);
+    var total = (decimal)(ViewBag.Total ?? 0m);
+    var itemCount = Model.Sum(i => i.Quantity);
+}
+
+<div class="cv-member-dashboard cv-cart-page">
+    <section class="cv-dash-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-cart-shopping me-1"></i> Checkout</p>
+                <h1 class="cv-dash-title">Shopping Cart</h1>
+                <p class="cv-dash-sub mb-0">
+                    @if (!Model.Any())
+                    {
+                        <text>Your cart is empty — add titles from the shop when you are ready.</text>
+                    }
+                    else
+                    {
+                        <text><strong>@itemCount</strong> @(itemCount == 1 ? "item" : "items") ready for checkout.</text>
+                    }
+                </p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                    <i class="fa-solid fa-compact-disc me-2"></i>Browse shop
+                </a>
+                @if (Model.Any())
+                {
+                    <a asp-controller="Wishlist" asp-action="Index" class="btn btn-cv-outline">
+                        <i class="fa-solid fa-heart me-2"></i>My collection
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+
+    @if (!Model.Any())
+    {
+        <div class="cv-dash-panel cv-cart-empty">
+            <i class="fa-solid fa-cart-shopping cv-cart-empty-icon" aria-hidden="true"></i>
+            <h2 class="h5 mb-2">Your cart is empty</h2>
+            <p class="text-cv-secondary mb-4">Discover music, games, and movies in the vault.</p>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                <i class="fa-solid fa-compact-disc me-2"></i>Continue shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="cv-dash-panel">
+                    <div class="cv-dash-panel-head">
+                        <h2 class="cv-dash-panel-title mb-0"><i class="fa-solid fa-list me-2 text-cv-gold"></i>Cart items</h2>
+                        <span class="text-cv-secondary small">@Model.Count @(Model.Count == 1 ? "product" : "products")</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table cv-table cv-dash-table cv-cart-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th class="cv-cart-qty-col">Qty</th>
+                                    <th>Subtotal</th>
+                                    <th class="text-end">Remove</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="cv-cart-product">
+                                                <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" class="cv-cart-thumb-link">
+                                                    <img src="@(item.CoverImageUrl ?? "/images/placeholder-album.svg")" alt="" class="cv-cart-thumb" onerror="this.src='/images/placeholder-album.svg'" />
+                                                </a>
+                                                <a asp-controller="Product" asp-action="Details" asp-route-id="@item.ProductId" class="cv-cart-product-title text-decoration-none">
+                                                    @item.Title
+                                                </a>
+                                            </div>
+                                        </td>
+                                        <td class="text-cv-secondary">$@item.UnitPrice.ToString("F2")</td>
+                                        <td>
+                                            @using (Html.BeginForm("UpdateCart", "Order", FormMethod.Post, new { @class = "cv-cart-qty-form" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                                <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control form-control-sm cv-cart-qty-input" onchange="this.form.submit()" />
+                                            }
+                                        </td>
+                                        <td class="text-cv-gold fw-semibold">$@item.LineTotal.ToString("F2")</td>
+                                        <td class="text-end">
+                                            @using (Html.BeginForm("RemoveFromCart", "Order", FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                                <button type="submit" class="btn btn-cv-danger-outline btn-sm cv-cart-remove" title="Remove from cart">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="cv-cart-panel-foot">
+                        <a asp-controller="Product" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Continue shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="cv-order-summary cv-cart-summary">
+                    <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-receipt me-2 text-cv-gold"></i>Order summary</h2>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-cv-secondary">Subtotal</span>
+                        <span class="fw-semibold">$@subtotal.ToString("F2")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-cv-secondary">Discount</span>
+                        <span class="text-cv-gold fw-semibold">-$@discount.ToString("F2")</span>
+                    </div>
+                    <hr class="cv-profile-divider" />
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="fw-semibold">Total</span>
+                        <span class="cv-total">$@total.ToString("F2")</span>
+                    </div>
+                    <a asp-controller="Order" asp-action="Checkout" class="btn btn-cv-primary w-100 btn-lg">
+                        <i class="fa-solid fa-lock me-2"></i>Proceed to checkout
+                    </a>
+                    <p class="text-cv-muted small text-center mt-3 mb-0">Paid from your wallet balance at checkout.</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>

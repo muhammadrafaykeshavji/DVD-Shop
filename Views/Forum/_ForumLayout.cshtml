@@ -1,0 +1,89 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["FullWidth"] = true;
+    var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    var isGeneral = action is "General" or "SendChat" or "Index";
+    var isQna = action is "Qna" or "QnaDetails" or "Ask";
+    var isQnaThread = action is "QnaDetails";
+    var isAsk = action == "Ask";
+    var title = ViewData["ChannelTitle"] as string ?? "Forum";
+    var toolbarIcon = ViewData["ChannelIcon"] as string ?? "fa-hashtag";
+}
+<div class="cv-member-dashboard cv-forum-page">
+    <div class="cv-forum-shell">
+        <div class="cv-discord-forum">
+            <aside class="cv-discord-sidebar" id="cvForumSidebar" aria-label="Forum channels">
+                <div class="cv-discord-sidebar-head">
+                    <span class="cv-forum-brand-icon" aria-hidden="true">◈</span>
+                    <div>
+                        <span class="cv-forum-brand-title">CineVault</span>
+                        <span class="cv-forum-brand-sub">Community</span>
+                    </div>
+                </div>
+                <p class="cv-discord-sidebar-section">Channels</p>
+                <a asp-action="General" class="cv-discord-channel @(isGeneral ? "is-active" : "")">
+                    <i class="fa-solid fa-hashtag"></i>
+                    <span>General</span>
+                </a>
+                <p class="cv-discord-sidebar-hint">Live chat for everyone</p>
+                <a asp-action="Qna" class="cv-discord-channel @(isQna ? "is-active" : "")">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <span>Q&amp;A</span>
+                </a>
+                <p class="cv-discord-sidebar-hint">Questions — admins answer</p>
+                @if (User.IsInRole("Member") || User.IsInRole("Admin"))
+                {
+                    <div class="cv-forum-sidebar-actions">
+                        <a asp-action="Ask" class="btn btn-cv-primary btn-sm w-100">
+                            <i class="fa-solid fa-plus me-1"></i> Ask question
+                        </a>
+                    </div>
+                }
+            </aside>
+
+            <div class="cv-discord-main">
+                <header class="cv-discord-toolbar">
+                    @if (isQnaThread || isAsk)
+                    {
+                        <a asp-action="Qna" class="cv-discord-back" aria-label="Back to Q&amp;A">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    }
+                    <div class="cv-discord-toolbar-title">
+                        <i class="fa-solid @toolbarIcon"></i>
+                        <div>
+                            @if (isQnaThread)
+                            {
+                                <span class="cv-discord-thread-channel">Q&amp;A thread</span>
+                            }
+                            else if (isAsk)
+                            {
+                                <span class="cv-discord-thread-channel">New question</span>
+                            }
+                            <h1>@title</h1>
+                        </div>
+                    </div>
+                    <div class="cv-discord-toolbar-actions">
+                        @if (IsSectionDefined("ToolbarActions"))
+                        {
+                            @RenderSection("ToolbarActions", required: false)
+                        }
+                    </div>
+                </header>
+                <div class="cv-discord-mobile-channels d-flex d-lg-none gap-2 px-3 py-2">
+                    <a asp-action="General" class="cv-discord-channel @(isGeneral ? "is-active" : "") flex-fill justify-content-center">
+                        <i class="fa-solid fa-hashtag"></i><span>General</span>
+                    </a>
+                    <a asp-action="Qna" class="cv-discord-channel @(isQna ? "is-active" : "") flex-fill justify-content-center">
+                        <i class="fa-solid fa-circle-question"></i><span>Q&amp;A</span>
+                    </a>
+                </div>
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

@@ -1,0 +1,171 @@
+@model PaginatedList<Product>
+@using E_project_DVD_Shop.Models
+@using E_project_DVD_Shop.Models.Entities
+@{
+    ViewData["Title"] = "Shop";
+    ViewData["FullWidth"] = true;
+    var categories = ViewBag.Categories as List<Category> ?? new();
+    var artists = ViewBag.Artists as List<Artist> ?? new();
+    var search = ViewBag.Search as string;
+    var categoryId = ViewBag.CategoryId as int?;
+    var artistId = ViewBag.ArtistId as int?;
+    var mediaType = ViewBag.MediaType as MediaType?;
+    var totalCount = ViewBag.TotalCount as int? ?? Model.Count;
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var showArtistFilter = mediaType is null or MediaType.Music;
+}
+
+<div class="cv-member-dashboard cv-shop-page">
+    <section class="cv-dash-hero cv-shop-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-compact-disc me-1"></i> Browse the vault</p>
+                <h1 class="cv-dash-title">Shop</h1>
+                <p class="cv-dash-sub mb-0">
+                    <strong>@totalCount</strong> title@(totalCount == 1 ? "" : "s")
+                    @if (mediaType.HasValue)
+                    {
+                        <span> · @mediaType</span>
+                    }
+                    else
+                    {
+                        <text> — movies, music, and games on disc.</text>
+                    }
+                </p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="News" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                    <i class="fa-solid fa-newspaper me-2"></i>News
+                </a>
+                <a asp-controller="Forum" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                    <i class="fa-solid fa-comments me-2"></i>Forum
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <nav class="cv-shop-media-pills" role="group" aria-label="Media type">
+        <a asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-artistId="@artistId"
+           class="cv-shop-pill @(mediaType == null ? "is-active" : "")">All</a>
+        @foreach (MediaType mt in Enum.GetValues<MediaType>())
+        {
+            <a asp-action="Index" asp-route-mediaType="@((int)mt)" asp-route-search="@search"
+               asp-route-categoryId="@(mt == mediaType ? categoryId : null)" asp-route-artistId="@(mt == MediaType.Music ? artistId : null)"
+               class="cv-shop-pill @(mediaType == mt ? "is-active" : "")">@mt</a>
+        }
+    </nav>
+
+    <div class="row g-4 cv-shop-layout">
+        <aside class="col-lg-3">
+            <div class="cv-dash-panel cv-shop-filters-panel">
+                <div class="cv-dash-panel-head cv-shop-filters-head">
+                    <h2 class="cv-dash-panel-title mb-0">
+                        <i class="fa-solid fa-filter me-2 text-cv-gold"></i>Filters
+                    </h2>
+                </div>
+                <form method="get" asp-action="Index" class="cv-shop-filters-form">
+                    <div class="mb-3">
+                        <label class="form-label">Search</label>
+                        <input name="search" value="@search" class="form-control form-control-sm" placeholder="Title, artist, studio…" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Genre</label>
+                        <select name="categoryId" class="form-select form-select-sm">
+                            <option value="">All genres</option>
+                            @foreach (var c in categories)
+                            {
+                                <option value="@c.CategoryId" selected="@(categoryId == c.CategoryId)">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+                    @if (showArtistFilter)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">Artist</label>
+                            <select name="artistId" class="form-select form-select-sm">
+                                <option value="">All artists</option>
+                                @foreach (var a in artists)
+                                {
+                                    <option value="@a.ArtistId" selected="@(artistId == a.ArtistId)">@a.Name</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    <input type="hidden" name="mediaType" value="@(mediaType.HasValue ? (int)mediaType : "")" />
+                    <div class="cv-shop-filter-actions">
+                        <button type="submit" class="btn btn-cv-primary w-100">Apply filters</button>
+                        <a asp-action="Index" class="btn btn-cv-outline w-100">Clear all</a>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <div class="col-lg-9 cv-shop-results">
+            @if (!string.IsNullOrWhiteSpace(search) || categoryId.HasValue || artistId.HasValue || mediaType.HasValue)
+            {
+                <div class="cv-shop-active-filters mb-3">
+                    @if (!string.IsNullOrWhiteSpace(search))
+                    {
+                        <span class="cv-filter-tag">
+                            Search: @search
+                            <a asp-action="Index" asp-route-categoryId="@categoryId" asp-route-artistId="@artistId" asp-route-mediaType="@(mediaType.HasValue ? (int)mediaType : null)" aria-label="Remove search">×</a>
+                        </span>
+                    }
+                    @if (mediaType.HasValue)
+                    {
+                        <span class="cv-filter-tag">
+                            @mediaType
+                            <a asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-artistId="@artistId" aria-label="Remove media type">×</a>
+                        </span>
+                    }
+                    @if (categoryId.HasValue)
+                    {
+                        var cat = categories.FirstOrDefault(c => c.CategoryId == categoryId);
+                        if (cat != null)
+                        {
+                            <span class="cv-filter-tag">
+                                @cat.Name
+                                <a asp-action="Index" asp-route-search="@search" asp-route-artistId="@artistId" asp-route-mediaType="@(mediaType.HasValue ? (int)mediaType : null)" aria-label="Remove genre">×</a>
+                            </span>
+                        }
+                    }
+                    @if (artistId.HasValue)
+                    {
+                        var art = artists.FirstOrDefault(a => a.ArtistId == artistId);
+                        if (art != null)
+                        {
+                            <span class="cv-filter-tag">
+                                @art.Name
+                                <a asp-action="Index" asp-route-search="@search" asp-route-categoryId="@categoryId" asp-route-mediaType="@(mediaType.HasValue ? (int)mediaType : null)" aria-label="Remove artist">×</a>
+                            </span>
+                        }
+                    }
+                </div>
+            }
+
+            @if (!Model.Any())
+            {
+                <div class="cv-dash-panel cv-shop-empty text-center py-5">
+                    <i class="fa-solid fa-compact-disc cv-shop-empty-icon" aria-hidden="true"></i>
+                    <h2 class="h5 mb-2">No titles found</h2>
+                    <p class="text-cv-secondary mb-3">Nothing matches your filters. Try clearing them or browse another media type.</p>
+                    <a asp-action="Index" class="btn btn-cv-primary">Browse all titles</a>
+                </div>
+            }
+            else
+            {
+                <div class="row g-3 cv-shop-grid" id="productGrid">
+                    @foreach (var p in Model)
+                    {
+                        <div class="col-6 col-md-4 col-xl-3">
+                            @await Html.PartialAsync("_ProductCard", p, new ViewDataDictionary(ViewData) { { "ReturnUrl", returnUrl } })
+                        </div>
+                    }
+                </div>
+                <div class="cv-shop-pagination mt-4">
+                    @await Html.PartialAsync("_Pagination", Model)
+                </div>
+            }
+        </div>
+    </div>
+</div>

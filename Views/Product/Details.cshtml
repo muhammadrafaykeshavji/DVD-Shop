@@ -1,0 +1,286 @@
+@model ProductDetailViewModel
+@using System.Globalization
+@using E_project_DVD_Shop.Helpers
+@using E_project_DVD_Shop.Models
+@using E_project_DVD_Shop.Models.ViewModels
+@{
+    var p = Model.Product;
+    ViewData["Title"] = ProductCatalogHelper.GetTitle(p);
+    ViewData["FullWidth"] = true;
+    var cover = ProductCatalogHelper.GetCoverUrl(p) ?? "/images/placeholder-album.svg";
+    var bannerUrl = ProductCatalogHelper.GetBannerUrl(p) ?? cover;
+    var bannerLandscape = ProductCatalogHelper.UsesLandscapeBanner(p, bannerUrl);
+    var hasCustomBanner = !string.IsNullOrWhiteSpace(p.Album?.BannerImageUrl);
+    var bannerVisibility = ProductCatalogHelper.GetBannerVisibilityPercent(p) / 100.0;
+    var bannerVisCss = bannerVisibility.ToString("0.##", CultureInfo.InvariantCulture);
+    var stockClass = p.Stock > 10 ? "in" : p.Stock > 0 ? "low" : "out";
+    var stockText = p.Stock > 0 ? $"{p.Stock} in stock" : "Out of stock";
+    var mediaType = ProductCatalogHelper.GetMediaType(p);
+    var categoryId = ProductCatalogHelper.GetCategoryId(p);
+    var categoryName = ProductCatalogHelper.GetCategoryName(p);
+    var description = ProductCatalogHelper.GetDescription(p);
+    var releaseDate = ProductCatalogHelper.GetReleaseDate(p);
+    var tagClass = mediaType switch
+    {
+        MediaType.Movie => "cv-arrival-tag--movie",
+        MediaType.Game => "cv-arrival-tag--game",
+        _ => "cv-arrival-tag--music"
+    };
+    var previewUrl = ProductCatalogHelper.GetPreviewUrl(p, Model.Songs);
+    var previewKind = ProductCatalogHelper.GetPreviewKind(previewUrl);
+    var canShop = User.IsInRole("Member") || User.IsInRole("Admin");
+    var canPurchase = canShop && p.IsAvailable && p.Stock > 0;
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var teaser = !string.IsNullOrWhiteSpace(description) && description.Length > 160
+        ? description[..160] + "…"
+        : description;
+}
+
+<div class="cv-product-detail">
+    <section class="cv-product-banner @(hasCustomBanner ? "cv-product-banner--custom" : "")"
+             style="--cv-banner-visibility: @bannerVisCss;"
+             aria-label="Product showcase">
+        <div class="cv-product-banner-backdrop" aria-hidden="true">
+            <img class="cv-product-banner-img @(bannerLandscape ? "cv-product-banner-img--landscape" : "cv-product-banner-img--portrait")"
+                 src="@bannerUrl"
+                 alt=""
+                 decoding="async"
+                 referrerpolicy="no-referrer"
+                 data-fallback="@cover"
+                 onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback;}" />
+        </div>
+        <div class="cv-product-banner-scrim" aria-hidden="true"></div>
+        <div class="cv-product-banner-inner">
+            <nav aria-label="breadcrumb" class="cv-product-breadcrumb mb-4">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a asp-action="Index">Shop</a></li>
+                    <li class="breadcrumb-item">
+                        <a asp-action="Index" asp-route-mediaType="@((int)mediaType)">@mediaType</a>
+                    </li>
+                    <li class="breadcrumb-item active">@ProductCatalogHelper.GetTitle(p)</li>
+                </ol>
+            </nav>
+
+            <div class="row g-4 g-xl-5 cv-product-hero mb-0">
+        <div class="col-lg-4 col-xl-4">
+            <div class="cv-detail-cover">
+                <img src="@cover" alt="@ProductCatalogHelper.GetTitle(p)"
+                     onerror="this.onerror=null;this.src='/images/placeholder-album.svg';" />
+            </div>
+        </div>
+
+        <div class="col-lg-8 col-xl-8">
+            <div class="cv-product-info">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <span class="cv-arrival-tag @tagClass">@mediaType</span>
+                    <span class="cv-product-meta-pill">@categoryName</span>
+                    @if (releaseDate > DateTime.MinValue)
+                    {
+                        <span class="cv-product-meta-pill"><i class="fa-regular fa-calendar me-1"></i>@releaseDate.ToString("MMM yyyy")</span>
+                    }
+                </div>
+
+                <h1 class="cv-product-title">@ProductCatalogHelper.GetTitle(p)</h1>
+                <p class="cv-product-credit">@ProductCatalogHelper.GetCreditName(p)</p>
+
+                <div class="cv-product-rating mb-3">
+                    @for (var i = 1; i <= 5; i++)
+                    {
+                        <span class="cv-star">@(i <= Math.Round(Model.AverageRating) ? "★" : "☆")</span>
+                    }
+                    <span class="text-cv-secondary small ms-2">
+                        @if (Model.AverageRating > 0)
+                        {
+                            @Model.AverageRating.ToString("F1")
+                        }
+                        (@Model.Reviews.Count @(Model.Reviews.Count == 1 ? "review" : "reviews"))
+                    </span>
+                </div>
+
+                <div class="cv-product-price-row mb-3">
+                    <span class="cv-product-price">$@p.Price.ToString("F2")</span>
+                    <span class="cv-stock @stockClass"><i class="fa-solid fa-box me-1"></i>@stockText</span>
+                </div>
+
+                <div class="cv-product-purchase-card mb-4">
+                    @if (canPurchase)
+                    {
+                        <div class="cv-product-qty-row mb-3">
+                            <label for="qty" class="form-label mb-0">Quantity</label>
+                            <input type="number" id="qty" form="addToCartForm" name="quantity"
+                                   class="form-control form-control-sm cv-product-qty"
+                                   value="1" min="1" max="@Math.Max(1, p.Stock)" />
+                        </div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <form asp-action="AddToCart" method="post" id="addToCartForm" class="flex-grow-1">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@p.ProductId" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-cv-primary btn-lg w-100">
+                                    <i class="fa-solid fa-cart-plus me-2"></i>Add to cart
+                                </button>
+                            </form>
+                            <form asp-controller="Wishlist" asp-action="Add" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@p.ProductId" />
+                                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                <button type="submit" class="btn btn-cv-outline btn-lg" title="Add to wishlist">
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else if (canShop && p.Stock <= 0)
+                    {
+                        <p class="text-cv-secondary mb-2"><i class="fa-solid fa-circle-xmark me-1"></i> Currently out of stock.</p>
+                        <a asp-action="Index" asp-route-mediaType="@((int)mediaType)" class="btn btn-cv-outline">Browse similar titles</a>
+                    }
+                    else if (canShop && !p.IsAvailable)
+                    {
+                        <p class="text-cv-secondary mb-0">This title is not available right now.</p>
+                    }
+                    else if (User.Identity?.IsAuthenticated != true)
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-cv-primary btn-lg">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>Sign in to purchase
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-cv-outline btn-lg ms-2">Create account</a>
+                    }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(teaser))
+                {
+                    <p class="cv-product-teaser text-cv-secondary mb-0">@teaser</p>
+                }
+            </div>
+        </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="cv-product-detail-body">
+    <ul class="nav cv-tabs cv-product-tabs mb-3" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabDesc" type="button">About</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabReviews" type="button">
+                Reviews <span class="cv-tab-count">@Model.Reviews.Count</span>
+            </button>
+        </li>
+        @if (categoryId.HasValue)
+        {
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabMore" type="button">More like this</button>
+            </li>
+        }
+    </ul>
+
+    <div class="tab-content cv-product-tab-content mb-5">
+        <div class="tab-pane fade show active" id="tabDesc">
+            <div class="cv-card cv-card-body">
+                <h6 class="text-cv-gold mb-3">Description</h6>
+                <p class="text-cv-secondary mb-0" style="line-height:1.75; white-space: pre-wrap;">
+                    @(description ?? "No description available for this title.")
+                </p>
+            </div>
+            @if (!string.IsNullOrEmpty(previewUrl))
+            {
+                <div class="cv-card cv-card-body cv-product-preview-card mt-3">
+                    <h6 class="cv-product-preview-label">
+                        <i class="fa-solid fa-play me-1"></i>
+                        @(previewKind == "audio" ? "Listen" : previewKind == "youtube" ? "Trailer" : "Preview")
+                    </h6>
+                    @await Html.PartialAsync("_MediaPreview", previewUrl)
+                </div>
+            }
+            else if (Model.Songs.Any(s => !string.IsNullOrEmpty(s.PreviewUrl)))
+            {
+                var firstSong = Model.Songs.First(s => !string.IsNullOrEmpty(s.PreviewUrl));
+                <div class="cv-card cv-card-body cv-product-preview-card mt-3">
+                    <h6 class="cv-product-preview-label"><i class="fa-solid fa-music me-1"></i> @firstSong.Title</h6>
+                    @await Html.PartialAsync("_MediaPreview", firstSong.PreviewUrl)
+                </div>
+            }
+            @if (Model.Songs.Count > 1)
+            {
+                <div class="cv-card cv-card-body mt-3">
+                    <h6 class="text-cv-gold mb-3"><i class="fa-solid fa-list-ol me-1"></i> Track listing</h6>
+                    <ol class="cv-track-list mb-0">
+                        @foreach (var song in Model.Songs.OrderBy(s => s.SongId))
+                        {
+                            <li>
+                                <span class="cv-track-title">@song.Title</span>
+                                @if (!string.IsNullOrEmpty(song.PreviewUrl))
+                                {
+                                    <span class="cv-track-preview-badge"><i class="fa-solid fa-play"></i> Preview</span>
+                                }
+                            </li>
+                        }
+                    </ol>
+                </div>
+            }
+        </div>
+
+        <div class="tab-pane fade" id="tabReviews">
+            @if (Model.Reviews.Any())
+            {
+                @foreach (var r in Model.Reviews)
+                {
+                    <div class="cv-card cv-card-body mb-2 cv-review-card">
+                        <div class="cv-stars mb-1">
+                            @string.Concat(Enumerable.Repeat("★", r.Rating))@string.Concat(Enumerable.Repeat("☆", 5 - r.Rating))
+                        </div>
+                        <p class="text-white mb-1">@(string.IsNullOrWhiteSpace(r.Comment) ? "—" : r.Comment)</p>
+                        <small class="text-cv-secondary">@(r.User?.UserName ?? "Member") · @r.CreatedDate.ToString("MMM dd, yyyy")</small>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="cv-card cv-card-body text-cv-secondary">
+                    <i class="fa-regular fa-comment-dots me-1"></i> No reviews yet. Be the first to share your thoughts.
+                </div>
+            }
+
+            @if (canShop && !Model.UserHasReviewed)
+            {
+                <div class="cv-card cv-card-body mt-3">
+                    <h6 class="text-cv-gold mb-3">Write a review</h6>
+                    <form asp-controller="Review" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ProductId" value="@p.ProductId" />
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <select name="Rating" class="form-select w-auto">
+                                @for (var i = 5; i >= 1; i--)
+                                {
+                                    <option value="@i">@i stars</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Comment</label>
+                            <textarea name="Comment" class="form-control" rows="3" placeholder="Share your thoughts…"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-cv-primary">Submit review</button>
+                    </form>
+                </div>
+            }
+        </div>
+
+        @if (categoryId.HasValue)
+        {
+            <div class="tab-pane fade" id="tabMore">
+                <div class="cv-card cv-card-body">
+                    <p class="text-cv-secondary mb-3">Discover more @categoryName titles in our @mediaType collection.</p>
+                    <a asp-action="Index" asp-route-categoryId="@categoryId" asp-route-mediaType="@((int)mediaType)"
+                       class="btn btn-cv-primary">
+                        Browse @categoryName <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+    </div>
+</div>

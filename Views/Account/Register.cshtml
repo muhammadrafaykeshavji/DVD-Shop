@@ -1,0 +1,47 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+<div class="cv-auth-wrap">
+    <div class="cv-auth-card">
+        <div class="cv-auth-logo">◈ CineVault</div>
+        <h5 class="text-white text-center mb-4">Join CineVault</h5>
+
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger small" })
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+            </div>
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+            </div>
+            <div class="mb-3 form-check">
+                <input class="form-check-input" type="checkbox" id="terms" required />
+                <label class="form-check-label" for="terms">I agree to the Terms of Service</label>
+            </div>
+            <button type="submit" class="btn btn-cv-primary w-100">Create Account</button>
+        }
+
+        <p class="text-center text-cv-secondary small mt-3 mb-0">
+            Already have an account? @Html.ActionLink("Sign In", "Login", "Account", null, new { @class = "text-cv-gold fw-semibold" })
+        </p>
+    </div>
+</div>
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

@@ -1,0 +1,94 @@
+@model PaginatedList<ForumPost>
+@using E_project_DVD_Shop.Helpers
+@{
+    ViewData["Title"] = "qna";
+    ViewData["ChannelTitle"] = "Q&A";
+    ViewData["ChannelIcon"] = "fa-circle-question";
+    var search = ViewBag.Search as string;
+}
+
+@section ToolbarActions {
+    @if (User.IsInRole("Member") || User.IsInRole("Admin"))
+    {
+        <a asp-action="Ask" class="btn btn-cv-primary btn-sm d-inline-flex align-items-center">
+            <i class="fa-solid fa-plus me-1"></i> Ask question
+        </a>
+    }
+}
+
+<div class="cv-forum-qna-panel">
+<form method="get" asp-action="Qna" class="cv-discord-search cv-forum-search">
+    <div class="input-group">
+        <span class="input-group-text">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+        <input type="search" name="search" value="@search" class="form-control" placeholder="Search questions…" />
+        @if (!string.IsNullOrWhiteSpace(search))
+        {
+            <a asp-action="Qna" class="btn btn-cv-outline input-group-text text-decoration-none">Clear</a>
+        }
+    </div>
+</form>
+
+<div class="cv-qna-forum-list" tabindex="0" aria-label="Questions">
+    @if (!Model.Any())
+    {
+        <div class="cv-discord-empty cv-forum-empty">
+            <i class="fa-solid fa-circle-question"></i>
+            <p class="mb-3">No questions yet.</p>
+            @if (User.IsInRole("Member") || User.IsInRole("Admin"))
+            {
+                <a asp-action="Ask" class="btn btn-cv-primary btn-sm">Ask the first question</a>
+            }
+        </div>
+    }
+    else
+    {
+        @foreach (var q in Model)
+        {
+            var authorName = q.User?.UserName ?? "Member";
+            var lastReply = q.Replies.OrderByDescending(r => r.CreatedDate).FirstOrDefault();
+            var lastUserName = lastReply?.User?.UserName ?? authorName;
+            var snippetUser = lastReply != null ? lastUserName : authorName;
+            var snippetText = lastReply != null
+                ? ForumDisplayHelper.Truncate(lastReply.Content, 72)
+                : ForumDisplayHelper.Truncate(q.Content, 72);
+            var answerCount = q.Replies.Count;
+            var messageCount = 1 + answerCount;
+            var participants = new HashSet<string?>([q.UserId]);
+            foreach (var r in q.Replies) participants.Add(r.UserId);
+            var participantCount = participants.Count;
+            var lastActivity = lastReply?.CreatedDate ?? q.CreatedDate;
+            var answered = answerCount > 0;
+            var avatarHue = ForumDisplayHelper.GetAvatarHue(lastUserName);
+            var avatarInitials = ForumDisplayHelper.GetInitials(lastUserName);
+
+            <a asp-action="QnaDetails" asp-route-id="@q.PostId" class="cv-forum-post-card">
+                <div class="cv-forum-post-body">
+                    <h2 class="cv-forum-post-title">@q.Title</h2>
+                    <p class="cv-forum-post-snippet">
+                        <span class="cv-forum-post-user">@snippetUser</span><span class="cv-forum-post-colon">: </span>@snippetText
+                    </p>
+                    <div class="cv-forum-post-foot">
+                        <span class="cv-forum-post-avatar" style="--avatar-hue: @avatarHue" title="@lastUserName">@avatarInitials</span>
+                        <span class="cv-forum-post-stat" title="Participants">@participantCount</span>
+                        <span class="cv-forum-post-msgs" title="Messages">
+                            <i class="fa-solid fa-message"></i> @messageCount.ToString("N0")
+                        </span>
+                        @if (!answered)
+                        {
+                            <span class="cv-forum-post-new">Awaiting answer</span>
+                        }
+                        <span class="cv-forum-post-sep" aria-hidden="true">·</span>
+                        <time class="cv-forum-post-time">@ForumDisplayHelper.FormatRelativeTime(lastActivity)</time>
+                    </div>
+                </div>
+            </a>
+        }
+    }
+</div>
+
+<div class="cv-discord-pagination cv-qna-pagination">
+    @await Html.PartialAsync("_Pagination", Model)
+</div>
+</div>

@@ -1,0 +1,64 @@
+@model PaginatedList<Order>
+@{
+    ViewData["Title"] = "Orders";
+    ViewData["AdminTitle"] = "Manage Orders";
+    ViewData["ShowAddButton"] = false;
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">#</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="cv-table-empty">
+                            <i class="fa-solid fa-receipt fa-2x mb-2 d-block opacity-50"></i>
+                            No orders yet.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var o in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@o.OrderId</span></td>
+                            <td class="text-white-cell">@o.User?.UserName</td>
+                            <td>@o.OrderDate.ToString("MMM dd, yyyy")</td>
+                            <td class="text-cv-gold fw-semibold">$@o.TotalAmount.ToString("N2")</td>
+                            <td><span class="cv-status cv-status-@o.Status.ToString().ToLowerInvariant()">@o.Status</span></td>
+                            <td class="text-end">
+                                <div class="cv-table-actions">
+                                    <a asp-action="Edit" asp-route-id="@o.OrderId" class="btn btn-sm btn-cv-outline" title="Edit order">
+                                        <i class="fa-solid fa-pen-to-square"></i><span class="d-none d-xl-inline ms-1">Edit</span>
+                                    </a>
+                                    <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this order?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@o.OrderId" />
+                                        <button type="submit" class="btn btn-sm btn-cv-danger-outline" title="Delete order">
+                                            <i class="fa-solid fa-trash"></i><span class="d-none d-xl-inline ms-1">Delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

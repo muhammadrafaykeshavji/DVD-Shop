@@ -1,0 +1,64 @@
+@model List<Permission>
+@{
+    ViewData["Title"] = "Permissions";
+    ViewData["FormTitle"] = "Module Permissions";
+    ViewData["FormIcon"] = "fa-lock";
+    ViewData["ShowAddButton"] = false;
+    var admins = ViewBag.Admins as List<ApplicationUser>;
+    var modules = ViewBag.Modules as string[];
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card cv-admin-form-wide mb-4">
+    <form method="get" class="cv-admin-form d-flex flex-wrap align-items-end gap-3">
+        <div class="flex-grow-1" style="min-width: 220px;">
+            <label class="form-label">Administrator</label>
+            <select name="adminId" class="form-select">
+                <option value="">— Select admin —</option>
+                @foreach (var a in admins ?? new List<ApplicationUser>())
+                {
+                    <option value="@a.Id" selected="@(ViewBag.SelectedAdminId as string == a.Id)">@a.UserName</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-cv-primary"><i class="fa-solid fa-magnifying-glass me-1"></i> Load</button>
+    </form>
+</div>
+
+@if (ViewBag.SelectedAdminId != null)
+{
+    @foreach (var mod in modules ?? Array.Empty<string>())
+    {
+        var perm = Model.FirstOrDefault(p => p.ModuleName == mod);
+        <div class="cv-dash-panel mb-3 cv-admin-form-card" style="max-width: none;">
+            <form asp-action="Save" method="post" class="cv-admin-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="adminId" value="@ViewBag.SelectedAdminId" />
+                <input type="hidden" name="moduleName" value="@mod" />
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <strong class="text-cv-gold">@mod</strong>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="canView" value="true" class="form-check-input" id="view_@mod" @(perm?.CanView == true ? "checked" : "") />
+                            <label class="form-check-label" for="view_@mod">View</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="canAdd" value="true" class="form-check-input" id="add_@mod" @(perm?.CanAdd == true ? "checked" : "") />
+                            <label class="form-check-label" for="add_@mod">Add</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="canEdit" value="true" class="form-check-input" id="edit_@mod" @(perm?.CanEdit == true ? "checked" : "") />
+                            <label class="form-check-label" for="edit_@mod">Edit</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="canDelete" value="true" class="form-check-input" id="del_@mod" @(perm?.CanDelete == true ? "checked" : "") />
+                            <label class="form-check-label" for="del_@mod">Delete</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-cv-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    }
+}

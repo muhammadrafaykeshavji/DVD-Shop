@@ -1,0 +1,16 @@
+@model (int Id, string EntityLabel)
+@{
+    var label = string.IsNullOrWhiteSpace(Model.EntityLabel) ? "item" : Model.EntityLabel;
+}
+<div class="cv-table-actions">
+    <a class="btn btn-sm btn-cv-outline" asp-action="Edit" asp-route-id="@Model.Id" title="Edit">
+        <i class="fa-solid fa-pen-to-square"></i><span class="d-none d-xl-inline ms-1">Edit</span>
+    </a>
+    <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this @label?');">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit" class="btn btn-sm btn-cv-danger-outline" title="Delete">
+            <i class="fa-solid fa-trash"></i><span class="d-none d-xl-inline ms-1">Delete</span>
+        </button>
+    </form>
+</div>

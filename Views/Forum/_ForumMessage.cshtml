@@ -1,0 +1,35 @@
+@using E_project_DVD_Shop.Helpers
+@model ForumPost
+@{
+    var isStarter = ViewData["IsStarter"] as bool? == true;
+    var isAdminAnswer = ViewData["IsAdminAnswer"] as bool? == true;
+    var starterLabel = ViewData["StarterLabel"] as string ?? "OP";
+    var userName = Model.User?.UserName ?? "Member";
+    var hue = ForumDisplayHelper.GetAvatarHue(userName);
+    var initials = ForumDisplayHelper.GetInitials(userName);
+    var roleClass = isAdminAnswer ? "cv-discord-msg--admin" : isStarter ? "cv-discord-msg--starter" : "";
+}
+<article class="cv-discord-msg @roleClass">
+    <div class="cv-discord-avatar" style="--avatar-hue: @hue" title="@userName">@initials</div>
+    <div class="cv-discord-msg-body">
+        <div class="cv-discord-msg-head">
+            <span class="cv-discord-username @(isAdminAnswer ? "text-cv-gold" : "")">@userName</span>
+            @if (isStarter)
+            {
+                <span class="cv-discord-starter-badge">@starterLabel</span>
+            }
+            @if (isAdminAnswer)
+            {
+                <span class="cv-discord-starter-badge cv-discord-starter-badge--admin">Admin</span>
+            }
+            <time class="cv-discord-timestamp" datetime="@Model.CreatedDate.ToString("o")">
+                @ForumDisplayHelper.FormatRelativeTime(Model.CreatedDate)
+            </time>
+        </div>
+        @if (isStarter && !string.IsNullOrWhiteSpace(Model.Title) && Model.Title is not ("-" or "—"))
+        {
+            <h2 class="cv-discord-qna-title">@Model.Title</h2>
+        }
+        <div class="cv-discord-msg-text">@Model.Content</div>
+    </div>
+</article>

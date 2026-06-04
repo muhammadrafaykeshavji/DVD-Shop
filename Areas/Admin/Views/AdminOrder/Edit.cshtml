@@ -1,0 +1,58 @@
+@model Order
+@{
+    ViewData["Title"] = "Edit Order";
+    ViewData["FormTitle"] = $"Order #{Model.OrderId}";
+    ViewData["FormSubtitle"] = $"{Model.User?.UserName} · {Model.OrderDate:MMM dd, yyyy} · ${Model.TotalAmount:N2}";
+    ViewData["FormIcon"] = "fa-receipt";
+    ViewData["SaveLabel"] = "Update Status";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="cv-dash-panel h-100">
+            <p class="cv-form-section-title">Order summary</p>
+            <dl class="row mb-0 small">
+                <dt class="col-5 text-cv-secondary">Customer</dt>
+                <dd class="col-7 fw-semibold">@Model.User?.UserName</dd>
+                <dt class="col-5 text-cv-secondary">Email</dt>
+                <dd class="col-7">@Model.User?.Email</dd>
+                <dt class="col-5 text-cv-secondary">Total</dt>
+                <dd class="col-7 text-cv-gold fw-semibold">$@Model.TotalAmount.ToString("N2")</dd>
+                <dt class="col-5 text-cv-secondary">Date</dt>
+                <dd class="col-7">@Model.OrderDate.ToString("f")</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="cv-dash-panel cv-admin-form-card mb-4" style="max-width: none;">
+            <p class="cv-form-section-title">Line items</p>
+            <ul class="list-unstyled mb-0">
+                @foreach (var i in Model.OrderItems)
+                {
+                    <li class="d-flex justify-content-between py-2 border-bottom" style="border-color: var(--cv-card-border) !important;">
+                        <span class="text-white-cell">@E_project_DVD_Shop.Helpers.ProductCatalogHelper.GetTitle(i.Product!) <span class="text-cv-muted">× @i.Quantity</span></span>
+                        <span class="text-cv-gold">$@((i.UnitPrice * i.Quantity).ToString("N2"))</span>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="cv-dash-panel cv-admin-form-card" style="max-width: none;">
+            <form asp-action="Edit" method="post" class="cv-admin-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.OrderId" />
+                <div class="mb-3">
+                    <label class="form-label">Order status</label>
+                    <select name="status" class="form-select">
+                        @foreach (var item in Html.GetEnumSelectList<OrderStatus>())
+                        {
+                            <option value="@item.Value" selected="@(item.Value == ((int)Model.Status).ToString())">@item.Text</option>
+                        }
+                    </select>
+                </div>
+                @await Html.PartialAsync("_AdminFormFooter")
+            </form>
+        </div>
+    </div>
+</div>

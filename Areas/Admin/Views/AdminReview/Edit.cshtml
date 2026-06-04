@@ -1,0 +1,42 @@
+@model Review
+@{
+    ViewData["Title"] = "Edit Review";
+    ViewData["FormTitle"] = "Edit Review";
+    ViewData["FormIcon"] = "fa-star";
+    ViewData["SaveLabel"] = "Update Review";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card">
+    <form asp-action="Edit" method="post" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReviewId" />
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="ProductId" />
+        <input type="hidden" asp-for="CreatedDate" />
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <label asp-for="Rating" class="form-label"></label>
+                <select asp-for="Rating" class="form-select">
+                    @for (var i = 1; i <= 5; i++)
+                    {
+                        <option value="@i">@i star@(i > 1 ? "s" : "")</option>
+                    }
+                </select>
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Comment" class="form-label"></label>
+                <textarea asp-for="Comment" class="form-control" rows="5" placeholder="Review text…"></textarea>
+                <span asp-validation-for="Comment" class="text-danger"></span>
+            </div>
+        </div>
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}

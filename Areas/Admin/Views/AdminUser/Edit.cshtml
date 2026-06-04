@@ -1,0 +1,71 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "Edit User";
+    ViewData["FormTitle"] = $"Edit User — {Model.UserName}";
+    ViewData["FormIcon"] = "fa-user";
+    ViewData["SaveLabel"] = "Save Changes";
+    var roles = ViewBag.Roles as IList<string>;
+    var isAdmin = roles?.Contains("Admin") == true;
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="row g-4">
+            <div class="col-12">
+                <p class="cv-form-section-title mb-2">Profile photo</p>
+                @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+                {
+                    <div class="cv-form-preview mb-2">
+                        <img src="@Model.ProfileImageUrl" alt="@Model.UserName" class="rounded-circle" style="width:96px;height:96px;object-fit:cover;" />
+                    </div>
+                }
+                <label class="form-label">Photo URL</label>
+                <input type="text" name="profileImageUrl" class="form-control" value="@Model.ProfileImageUrl" placeholder="https://example.com/avatar.jpg" />
+                <span class="field-hint">Paste a direct image link, or upload below. Upload takes priority.</span>
+                <label class="form-label mt-3">Or upload photo</label>
+                <input type="file" name="avatarFile" class="form-control" accept="image/*" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" value="@Model.UserName" readonly disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="text" class="form-control" value="@Model.Email" readonly disabled />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Balance</label>
+                <div class="input-group">
+                    <span class="input-group-text" style="background: var(--cv-section); border-color: var(--cv-card-border); color: var(--cv-gold);">$</span>
+                    <input name="balance" type="number" step="0.01" class="form-control" value="@Model.Balance" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Role</label>
+                <select name="role" class="form-select">
+                    @if (isAdmin)
+                    {
+                        <option value="Member">Member</option>
+                        <option value="Admin" selected>Admin</option>
+                    }
+                    else
+                    {
+                        <option value="Member" selected>Member</option>
+                        <option value="Admin">Admin</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12">
+                <div class="form-check form-switch">
+                    <input name="isActive" type="checkbox" class="form-check-input" value="true" id="userActive" @(Model.IsActive ? "checked" : "") />
+                    <label class="form-check-label" for="userActive">Account active</label>
+                </div>
+            </div>
+        </div>
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>

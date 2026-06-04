@@ -1,0 +1,35 @@
+@model Advertisement
+@{
+    var isEdit = Model?.AdId > 0;
+}
+<div class="row g-4">
+    <div class="col-md-4">
+        <label asp-for="Position" class="form-label"></label>
+        <select asp-for="Position" class="form-select" asp-items="Html.GetEnumSelectList<AdPosition>()"></select>
+    </div>
+    <div class="col-md-8">
+        <label asp-for="LinkUrl" class="form-label"></label>
+        <input asp-for="LinkUrl" class="form-control" placeholder="https://…" />
+    </div>
+    <div class="col-12">
+        <div class="form-check form-switch">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label">Banner active</label>
+        </div>
+    </div>
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">Banner image</p>
+        @if (isEdit && !string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="cv-form-preview mb-2">
+                <img src="@Model.ImageUrl" alt="Banner" class="cv-table-thumb-wide" style="max-width: 200px; max-height: 80px;" />
+            </div>
+        }
+        <label asp-for="ImageUrl" class="form-label">Banner image URL</label>
+        <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/banner.jpg" />
+        <span class="field-hint">Paste a direct image link, or upload a file below. Upload takes priority if both are provided.</span>
+        <label class="form-label mt-3">Or upload image</label>
+        <input type="file" name="imageFile" class="form-control" accept="image/*" />
+        <span class="field-hint">Leave both empty when editing to keep the current banner.</span>
+    </div>
+</div>

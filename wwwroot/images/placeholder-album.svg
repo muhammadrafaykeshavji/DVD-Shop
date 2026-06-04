@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="560" viewBox="0 0 400 560">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1b3e"/>
+      <stop offset="100%" style="stop-color:#1a3060"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="560" fill="url(#bg)"/>
+  <circle cx="200" cy="220" r="72" fill="none" stroke="#f0b429" stroke-width="4" opacity="0.9"/>
+  <circle cx="200" cy="220" r="28" fill="#f0b429" opacity="0.35"/>
+  <text x="200" y="340" text-anchor="middle" fill="#f0b429" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600">CineVault</text>
+  <text x="200" y="372" text-anchor="middle" fill="#8899bb" font-family="Segoe UI, Arial, sans-serif" font-size="14">Album Cover</text>
+</svg>

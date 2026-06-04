@@ -1,0 +1,25 @@
+@model List<Song>
+@{ ViewData["Title"] = "Download Center"; }
+
+<h1 class="cv-section-title">Download Center</h1>
+
+<h5 class="text-cv-gold mb-3">Free Songs</h5>
+@if (!Model.Any())
+{
+    <p class="text-cv-secondary">No free downloads available at the moment.</p>
+}
+else
+{
+    <div class="cv-card cv-card-body mb-4">
+        @foreach (var s in Model)
+        {
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom" style="border-color: var(--cv-card-border) !important;">
+                <div>
+                    <span class="text-white d-block">@s.Title</span>
+                    <small class="text-cv-secondary">@s.Album?.Title</small>
+                </div>
+                <a href="@s.DownloadUrl" class="btn btn-cv-primary btn-sm" download><i class="fa-solid fa-download me-1"></i> Download</a>
+            </div>
+        }
+    </div>
+}

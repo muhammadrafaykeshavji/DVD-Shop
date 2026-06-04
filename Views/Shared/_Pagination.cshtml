@@ -1,0 +1,62 @@
+@model dynamic
+@{
+    var list = Model as IPaginated ?? null;
+    string? Q(string key) =>
+        Context.Request.Query.TryGetValue(key, out var value) && !string.IsNullOrWhiteSpace(value)
+            ? value.ToString()
+            : null;
+}
+@if (list != null && list.TotalPages > 1)
+{
+    <nav class="mt-4" aria-label="Pagination">
+        <ul class="pagination justify-content-center cv-pagination">
+            <li class="page-item @(list.HasPreviousPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="@ViewContext.RouteData.Values["action"]"
+                   asp-route-page="@(list.PageIndex - 1)"
+                   asp-route-search="@Q("search")"
+                   asp-route-categoryId="@Q("categoryId")"
+                   asp-route-artistId="@Q("artistId")"
+                   asp-route-albumId="@Q("albumId")"
+                   asp-route-mediaType="@Q("mediaType")"
+                   asp-route-category="@(ViewData["PaginationCategory"] as string ?? Q("category"))"
+                   asp-route-available="@Q("available")"
+                   asp-route-type="@Q("type")">Previous</a>
+            </li>
+            @{
+                var start = Math.Max(1, list.PageIndex - 2);
+                var end = Math.Min(list.TotalPages, list.PageIndex + 2);
+            }
+            @for (var i = start; i <= end; i++)
+            {
+                <li class="page-item @(i == list.PageIndex ? "active" : "")">
+                    <a class="page-link"
+                       asp-action="@ViewContext.RouteData.Values["action"]"
+                       asp-route-page="@i"
+                       asp-route-search="@Q("search")"
+                       asp-route-categoryId="@Q("categoryId")"
+                       asp-route-artistId="@Q("artistId")"
+                       asp-route-albumId="@Q("albumId")"
+                       asp-route-mediaType="@Q("mediaType")"
+                       asp-route-category="@(ViewData["PaginationCategory"] as string ?? Q("category"))"
+                       asp-route-available="@Q("available")"
+                       asp-route-type="@Q("type")">@i</a>
+                </li>
+            }
+            <li class="page-item @(list.HasNextPage ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="@ViewContext.RouteData.Values["action"]"
+                   asp-route-page="@(list.PageIndex + 1)"
+                   asp-route-search="@Q("search")"
+                   asp-route-categoryId="@Q("categoryId")"
+                   asp-route-artistId="@Q("artistId")"
+                   asp-route-albumId="@Q("albumId")"
+                   asp-route-mediaType="@Q("mediaType")"
+                   asp-route-category="@(ViewData["PaginationCategory"] as string ?? Q("category"))"
+                   asp-route-available="@Q("available")"
+                   asp-route-type="@Q("type")">Next</a>
+            </li>
+        </ul>
+        <p class="text-center text-cv-muted small mb-0">Page @list.PageIndex of @list.TotalPages</p>
+    </nav>
+}

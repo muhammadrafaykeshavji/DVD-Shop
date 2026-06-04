@@ -1,0 +1,84 @@
+@model Album
+@{
+    var isEdit = Model?.AlbumId > 0;
+}
+<div class="cv-product-form-help mb-4">
+    <i class="fa-solid fa-compact-disc text-cv-gold me-2"></i>
+    <div>
+        <strong>Music albums only</strong>
+        <p class="mb-0 small text-cv-secondary">Games and movies are managed under <strong>Games</strong> and <strong>Movies</strong> in the sidebar — not here.</p>
+    </div>
+</div>
+<div class="row g-4">
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label">Album title</label>
+        <input asp-for="Title" class="form-control" placeholder="e.g. 1989" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="ReleaseDate" class="form-label"></label>
+        <input asp-for="ReleaseDate" type="date" class="form-control" />
+        <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="ArtistId" class="form-label">Artist</label>
+        <select asp-for="ArtistId" class="form-select" asp-items="ViewBag.ArtistId">
+            <option value="">— Select artist —</option>
+        </select>
+        <span asp-validation-for="ArtistId" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MusicStudioId" class="form-label">Record label (optional)</label>
+        <select asp-for="MusicStudioId" class="form-select" asp-items="ViewBag.MusicStudioId">
+            <option value="">— None —</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+            <option value="">— Select category —</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Album description…"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">Cover image</p>
+        @if (isEdit && !string.IsNullOrEmpty(Model.CoverImageUrl))
+        {
+            <div class="cv-form-preview mb-2">
+                <img src="@Model.CoverImageUrl" alt="@Model.Title" />
+            </div>
+        }
+        <label asp-for="CoverImageUrl" class="form-label">Cover image URL</label>
+        <input asp-for="CoverImageUrl" class="form-control" placeholder="https://example.com/cover.jpg" />
+        <span class="field-hint">Paste a direct image link, or upload a file below.</span>
+        <label class="form-label mt-3">Or upload cover</label>
+        <input type="file" name="coverFile" class="form-control" accept="image/*" />
+    </div>
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">Landscape banner (product page background)</p>
+        @if (isEdit && !string.IsNullOrEmpty(Model.BannerImageUrl))
+        {
+            <div class="cv-form-preview mb-2 cv-form-preview--wide">
+                <img src="@Model.BannerImageUrl" alt="@Model.Title banner" />
+            </div>
+        }
+        <label asp-for="BannerImageUrl" class="form-label">Wide banner URL</label>
+        <input asp-for="BannerImageUrl" class="form-control" placeholder="https://example.com/wide-banner.jpg" />
+        <span class="field-hint">Wide promo art (like a Steam header). Shown blurred behind the product page. External URLs are copied into your site on save so they always load.</span>
+        <label class="form-label mt-3">Or upload banner</label>
+        <input type="file" name="bannerFile" class="form-control" accept="image/*" />
+        <div class="mt-4">
+            <label asp-for="BannerVisibility" class="form-label d-flex justify-content-between align-items-center">
+                <span>Banner visibility on product page</span>
+                <span class="cv-banner-vis-value text-cv-gold fw-semibold">@(Model?.BannerVisibility ?? 50)%</span>
+            </label>
+            <input asp-for="BannerVisibility" type="range" class="form-range cv-banner-vis-range" min="0" max="100" step="5" />
+            <span class="field-hint">Lower = darker overlay and subtler art. Higher = brighter, more visible blurred banner behind the product.</span>
+        </div>
+    </div>
+</div>

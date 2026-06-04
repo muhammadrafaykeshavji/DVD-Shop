@@ -1,0 +1,112 @@
+@model List<CartItem>
+@{
+    ViewData["Title"] = "Checkout";
+    var subtotal = (decimal)(ViewBag.Subtotal ?? 0m);
+    var discount = (decimal)(ViewBag.Discount ?? 0m);
+    var total = (decimal)(ViewBag.Total ?? 0m);
+    var balance = (decimal)(ViewBag.Balance ?? 0m);
+}
+
+<h1 class="cv-section-title">Checkout</h1>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="cv-card cv-card-body">
+            <h5 class="text-cv-gold mb-3">Shipping Details</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" placeholder="Your name" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-control" placeholder="+1 234 567 8900" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" placeholder="Street address" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Postal Code</label>
+                    <input type="text" class="form-control" />
+                </div>
+            </div>
+
+            <h5 class="text-cv-gold mb-3 mt-4">Payment Method</h5>
+            <p class="text-cv-secondary small">Orders are paid from your account balance ($@balance.ToString("F2") available).</p>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payBalance" checked />
+                <label class="form-check-label" for="payBalance">Account Balance</label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payCod" />
+                <label class="form-check-label" for="payCod">Cash on Delivery (display only)</label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="paymentMethod" id="payCard" />
+                <label class="form-check-label" for="payCard">Credit Card (display only)</label>
+            </div>
+            <div id="cardFields" class="row g-3 d-none">
+                <div class="col-12">
+                    <label class="form-label">Card Number</label>
+                    <input type="text" class="form-control" placeholder="0000 0000 0000 0000" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Expiry</label>
+                    <input type="text" class="form-control" placeholder="MM/YY" disabled />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">CVV</label>
+                    <input type="text" class="form-control" placeholder="123" disabled />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="cv-order-summary">
+            <h5 class="fw-semibold mb-3">Order Summary</h5>
+            <ul class="list-unstyled mb-3">
+                @foreach (var item in Model)
+                {
+                    <li class="d-flex justify-content-between text-cv-secondary small mb-2">
+                        <span>@item.Title × @item.Quantity</span>
+                        <span>$@item.LineTotal.ToString("F2")</span>
+                    </li>
+                }
+            </ul>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cv-secondary">Subtotal</span><span>$@subtotal.ToString("F2")</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+                <span class="text-cv-secondary">Discount</span><span class="text-cv-gold">-$@discount.ToString("F2")</span>
+            </div>
+            <hr style="border-color: var(--cv-card-border);" />
+            <div class="d-flex justify-content-between mb-4">
+                <span class="fw-semibold">Total</span>
+                <span class="cv-total">$@total.ToString("F2")</span>
+            </div>
+            @using (Html.BeginForm("PlaceOrder", "Order", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-cv-primary w-100 btn-lg" onclick="return confirm('Place this order?');">
+                    Place Order
+                </button>
+            }
+            @Html.ActionLink("Back to Cart", "Cart", "Order", null, new { @class = "btn btn-cv-outline w-100 mt-2" })
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(r => {
+        r.addEventListener('change', () => {
+            document.getElementById('cardFields').classList.toggle('d-none', document.getElementById('payCard').checked === false);
+        });
+    });
+</script>
+}

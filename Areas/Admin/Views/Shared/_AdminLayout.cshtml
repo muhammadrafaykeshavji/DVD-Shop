@@ -1,0 +1,91 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CineVault Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mockup1.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+</head>
+<body class="cv-admin-body">
+    <button type="button" class="cv-admin-sidebar-backdrop" data-cv-admin-sidebar-backdrop aria-label="Close menu" tabindex="-1"></button>
+
+    <aside class="cv-admin-sidebar" id="cvAdminSidebar" aria-label="Admin navigation">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="brand text-decoration-none">◈ CineVault</a>
+        <div class="cv-admin-sidebar-nav">
+        <nav class="nav flex-column">
+            <a class="nav-link @(controller == "AdminDashboard" ? "active" : "")" asp-area="Admin" asp-controller="AdminDashboard" asp-action="Index"><i class="fa-solid fa-gauge"></i>Dashboard</a>
+            <a class="nav-link @(controller == "AdminCategory" ? "active" : "")" asp-area="Admin" asp-controller="AdminCategory" asp-action="Index"><i class="fa-solid fa-tags"></i>Categories</a>
+            <a class="nav-link @(controller == "AdminArtist" ? "active" : "")" asp-area="Admin" asp-controller="AdminArtist" asp-action="Index"><i class="fa-solid fa-microphone"></i>Artists</a>
+            <a class="nav-link @(controller == "AdminMusicStudio" ? "active" : "")" asp-area="Admin" asp-controller="AdminMusicStudio" asp-action="Index"><i class="fa-solid fa-record-vinyl"></i>Music Studios</a>
+            <a class="nav-link @(controller == "AdminGameStudio" ? "active" : "")" asp-area="Admin" asp-controller="AdminGameStudio" asp-action="Index"><i class="fa-solid fa-building"></i>Game Studios</a>
+            <a class="nav-link @(controller == "AdminFilmStudio" ? "active" : "")" asp-area="Admin" asp-controller="AdminFilmStudio" asp-action="Index"><i class="fa-solid fa-clapperboard"></i>Film Studios</a>
+            <a class="nav-link @(controller == "AdminAlbum" ? "active" : "")" asp-area="Admin" asp-controller="AdminAlbum" asp-action="Index"><i class="fa-solid fa-compact-disc"></i>Music Albums</a>
+            <a class="nav-link @(controller == "AdminProduct" ? "active" : "")" asp-area="Admin" asp-controller="AdminProduct" asp-action="Index"><i class="fa-solid fa-box"></i>Products</a>
+            <a class="nav-link @(controller == "AdminSong" ? "active" : "")" asp-area="Admin" asp-controller="AdminSong" asp-action="Index"><i class="fa-solid fa-music"></i>Songs</a>
+            <a class="nav-link @(controller == "AdminGame" ? "active" : "")" asp-area="Admin" asp-controller="AdminGame" asp-action="Index"><i class="fa-solid fa-gamepad"></i>Games</a>
+            <a class="nav-link @(controller == "AdminMovie" ? "active" : "")" asp-area="Admin" asp-controller="AdminMovie" asp-action="Index"><i class="fa-solid fa-film"></i>Movies</a>
+            <a class="nav-link @(controller == "AdminUser" ? "active" : "")" asp-area="Admin" asp-controller="AdminUser" asp-action="Index"><i class="fa-solid fa-users"></i>Users</a>
+            <a class="nav-link @(controller == "AdminOrder" ? "active" : "")" asp-area="Admin" asp-controller="AdminOrder" asp-action="Index"><i class="fa-solid fa-receipt"></i>Orders</a>
+            <a class="nav-link @(controller == "AdminSupplier" ? "active" : "")" asp-area="Admin" asp-controller="AdminSupplier" asp-action="Index"><i class="fa-solid fa-truck"></i>Suppliers</a>
+            <a class="nav-link @(controller == "AdminProducer" ? "active" : "")" asp-area="Admin" asp-controller="AdminProducer" asp-action="Index"><i class="fa-solid fa-building"></i>Producers</a>
+            <a class="nav-link @(controller == "AdminPurchasingInvoice" ? "active" : "")" asp-area="Admin" asp-controller="AdminPurchasingInvoice" asp-action="Index"><i class="fa-solid fa-file-invoice"></i>Invoices</a>
+            <a class="nav-link @(controller == "AdminNews" ? "active" : "")" asp-area="Admin" asp-controller="AdminNews" asp-action="Index"><i class="fa-solid fa-newspaper"></i>News</a>
+            <a class="nav-link @(controller == "AdminFeedback" ? "active" : "")" asp-area="Admin" asp-controller="AdminFeedback" asp-action="Index"><i class="fa-solid fa-comment"></i>Feedback</a>
+            <a class="nav-link @(controller == "AdminPromotion" ? "active" : "")" asp-area="Admin" asp-controller="AdminPromotion" asp-action="Index"><i class="fa-solid fa-percent"></i>Promotions</a>
+            <a class="nav-link @(controller == "AdminAdvertisement" ? "active" : "")" asp-area="Admin" asp-controller="AdminAdvertisement" asp-action="Index"><i class="fa-solid fa-image"></i>Banners</a>
+            <a class="nav-link @(controller == "AdminReview" ? "active" : "")" asp-area="Admin" asp-controller="AdminReview" asp-action="Index"><i class="fa-solid fa-star"></i>Reviews</a>
+            <a class="nav-link @(controller == "AdminPermission" ? "active" : "")" asp-area="Admin" asp-controller="AdminPermission" asp-action="Index"><i class="fa-solid fa-lock"></i>Permissions</a>
+            <a class="nav-link @(controller == "AdminReport" ? "active" : "")" asp-area="Admin" asp-controller="AdminReport" asp-action="Index"><i class="fa-solid fa-chart-line"></i>Reports</a>
+            <a class="nav-link @(controller == "AdminAdministrator" ? "active" : "")" asp-area="Admin" asp-controller="AdminAdministrator" asp-action="Index"><i class="fa-solid fa-user-shield"></i>Administrators</a>
+            <hr style="border-color: var(--cv-navbar-border); margin: 1rem 1.25rem;" />
+            <a class="nav-link cv-nav-site" asp-area="" asp-controller="Home" asp-action="Index" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>View Website</a>
+        </nav>
+        </div>
+    </aside>
+
+    <div class="cv-admin-topbar d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <button type="button"
+                    class="btn btn-cv-outline btn-sm cv-admin-sidebar-toggle"
+                    data-cv-admin-sidebar-toggle
+                    aria-controls="cvAdminSidebar"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation menu">
+                <i class="fa-solid fa-bars" aria-hidden="true"></i>
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <span class="text-cv-secondary d-none d-sm-inline">Administration Panel</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 gap-md-3">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-cv-outline btn-sm d-inline-flex align-items-center" target="_blank" rel="noopener" title="View Website">
+                <i class="fa-solid fa-globe me-sm-1"></i><span class="d-none d-sm-inline">View Website</span>
+            </a>
+            <span class="text-cv-gold d-none d-md-inline"><i class="fa-regular fa-bell"></i></span>
+            <span class="text-cv-gold small d-none d-sm-inline">@User.Identity?.Name</span>
+            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-cv-outline btn-sm">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <main class="cv-admin-content cv-admin-page">
+        @RenderBody()
+    </main>
+
+    @await Html.PartialAsync("_Alerts")
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

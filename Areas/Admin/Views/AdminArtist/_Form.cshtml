@@ -1,0 +1,31 @@
+@model Artist
+@{
+    var isEdit = Model?.ArtistId > 0;
+}
+<div class="row g-4">
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" placeholder="Artist name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="Bio" class="form-label"></label>
+        <textarea asp-for="Bio" class="form-control" rows="4" placeholder="Short biography…"></textarea>
+        <span asp-validation-for="Bio" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">Profile image</p>
+        @if (isEdit && !string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="cv-form-preview mb-2">
+                <img src="@Model.ImageUrl" alt="@Model.Name" />
+            </div>
+        }
+        <label asp-for="ImageUrl" class="form-label">Image URL</label>
+        <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/photo.jpg" />
+        <span class="field-hint">Paste a direct image link, or upload a file below. Upload takes priority if both are provided.</span>
+        <label class="form-label mt-3">Or upload image</label>
+        <input type="file" name="imageFile" class="form-control" accept="image/*" />
+        <span class="field-hint">JPG, PNG or WebP — max 5MB.</span>
+    </div>
+</div>

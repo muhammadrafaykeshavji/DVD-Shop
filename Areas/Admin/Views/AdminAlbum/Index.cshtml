@@ -1,0 +1,64 @@
+@model PaginatedList<Album>
+@{
+    ViewData["Title"] = "Manage Album";
+    ViewData["AdminTitle"] = "Manage Music Albums";
+    const string entityLabel = "album";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th style="width: 56px;"></th>
+                    <th>Title</th>
+                    <th>Artist</th>
+                    <th>Category</th>
+                    <th>Released</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No albums yet. <a asp-action="Create">Add the first album</a>.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.AlbumId</span></td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.CoverImageUrl))
+                                {
+                                    <img src="@item.CoverImageUrl" alt="@item.Title" class="cv-table-thumb" onerror="this.onerror=null;this.src='/images/placeholder-album.svg';" />
+                                }
+                                else
+                                {
+                                    <span class="cv-table-thumb-placeholder"><i class="fa-solid fa-compact-disc"></i></span>
+                                }
+                            </td>
+                            <td class="text-white-cell">@item.Title</td>
+                            <td>@item.Artist?.Name</td>
+                            <td>@item.Category?.Name</td>
+                            <td>@item.ReleaseDate.ToString("MMM dd, yyyy")</td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.AlbumId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

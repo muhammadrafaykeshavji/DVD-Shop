@@ -1,0 +1,26 @@
+@model Feedback
+@{
+    ViewData["Title"] = "Reply to Feedback";
+    ViewData["FormTitle"] = "Reply to Feedback";
+    ViewData["FormSubtitle"] = $"From {Model.User?.UserName}";
+    ViewData["FormIcon"] = "fa-comment";
+    ViewData["SaveLabel"] = "Send Reply";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card cv-admin-form-wide">
+    <div class="mb-4 p-3 rounded" style="background: var(--cv-section); border: 1px solid var(--cv-card-border);">
+        <p class="text-cv-secondary small mb-1">Customer message</p>
+        <p class="cv-admin-quote mb-0">@Model.Message</p>
+    </div>
+    <form asp-action="Reply" method="post" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.FeedbackId" />
+        <div class="mb-3">
+            <label class="form-label">Your reply</label>
+            <textarea name="adminReply" class="form-control" rows="5" placeholder="Write your response…">@Model.AdminReply</textarea>
+        </div>
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>

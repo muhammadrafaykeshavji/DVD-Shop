@@ -1,0 +1,51 @@
+@using E_project_DVD_Shop.Helpers
+@using E_project_DVD_Shop.Models
+@model E_project_DVD_Shop.Models.Entities.Wishlist
+@{
+    var product = Model.Product!;
+    var cover = ProductCatalogHelper.GetCoverUrl(product) ?? "/images/placeholder-album.svg";
+    var category = ProductCatalogHelper.GetCategoryName(product);
+    var title = ProductCatalogHelper.GetTitle(product);
+    var mediaType = ProductCatalogHelper.GetMediaType(product);
+    var tagClass = mediaType switch
+    {
+        MediaType.Movie => "cv-arrival-tag--movie",
+        MediaType.Game => "cv-arrival-tag--game",
+        _ => "cv-arrival-tag--music"
+    };
+}
+<article class="cv-wishlist-card">
+    <div class="cv-card cv-product-card h-100">
+        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none cv-product-card-link">
+            <div class="cv-thumb">
+                <span class="cv-arrival-tag @tagClass">@mediaType</span>
+                <img src="@cover" alt="@title" onerror="this.src='/images/placeholder-album.svg'" />
+            </div>
+        </a>
+        <div class="cv-card-body d-flex flex-column">
+            <span class="cv-category">@category</span>
+            <h6 class="cv-title">
+                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none">@title</a>
+            </h6>
+            <p class="cv-artist mb-2">@ProductCatalogHelper.GetCreditName(product)</p>
+            <div class="d-flex justify-content-between align-items-center gap-1 flex-wrap mt-auto">
+                <span class="cv-price">$@product.Price.ToString("F2")</span>
+                <form asp-controller="Product" asp-action="AddToCart" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@product.ProductId" />
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                    <button type="submit" class="btn btn-cv-primary btn-sm" title="Add to cart">
+                        <i class="fa-solid fa-cart-plus"></i>
+                    </button>
+                </form>
+            </div>
+            <form asp-controller="Wishlist" asp-action="Remove" method="post" class="cv-wishlist-remove mt-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.WishlistId" />
+                <button type="submit" class="btn btn-cv-danger-outline btn-sm w-100">
+                    <i class="fa-solid fa-heart-crack me-1"></i>Remove from collection
+                </button>
+            </form>
+        </div>
+    </div>
+</article>

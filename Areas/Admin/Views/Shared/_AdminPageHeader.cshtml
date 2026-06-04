@@ -1,0 +1,23 @@
+@{
+    var title = ViewData["AdminTitle"] as string ?? ViewData["Title"]?.ToString() ?? "Manage";
+    var subtitle = ViewData["AdminSubtitle"] as string;
+    var showAdd = ViewData["ShowAddButton"] as bool? ?? true;
+    var addAction = ViewData["AddAction"] as string ?? "Create";
+    var icon = ViewData["AdminIcon"] as string ?? "fa-folder-open";
+}
+<section class="cv-admin-page-head">
+    <div class="cv-admin-page-head-text">
+        <p class="cv-dash-eyebrow"><i class="fa-solid @icon me-1"></i> Manage</p>
+        <h1 class="cv-dash-title">@title</h1>
+        @if (!string.IsNullOrEmpty(subtitle))
+        {
+            <p class="cv-dash-sub mb-0">@subtitle</p>
+        }
+    </div>
+    @if (showAdd)
+    {
+        <a asp-action="@addAction" class="btn btn-cv-primary btn-sm">
+            <i class="fa-solid fa-plus me-1"></i>Add new
+        </a>
+    }
+</section>

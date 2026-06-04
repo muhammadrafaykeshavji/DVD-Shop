@@ -1,0 +1,113 @@
+@model PaginatedList<News>
+@{
+    ViewData["Title"] = "News";
+    var currentCategory = ViewBag.Category as string;
+    var categoryLabel = ViewBag.CategoryLabel as string;
+    var pageTitle = string.IsNullOrEmpty(currentCategory)
+        ? "Industry News"
+        : categoryLabel?.ToString() ?? "Industry News";
+}
+
+<div class="cv-member-dashboard cv-news-page">
+    <section class="cv-dash-hero cv-news-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-newspaper me-1"></i> Headlines</p>
+                <h1 class="cv-dash-title">@pageTitle</h1>
+                <p class="cv-dash-sub mb-0">
+                    @if (string.IsNullOrEmpty(currentCategory))
+                    {
+                        <text>Gaming, music, and film industry updates from trusted RSS feeds.</text>
+                    }
+                    else
+                    {
+                        <text>Showing <strong>@categoryLabel</strong> articles.</text>
+                        <a asp-action="Index" class="text-cv-gold fw-semibold ms-1">View all</a>
+                    }
+                </p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                    <i class="fa-solid fa-compact-disc me-2"></i>Shop
+                </a>
+                <a asp-controller="Forum" asp-action="Index" class="btn btn-cv-outline btn-sm">
+                    <i class="fa-solid fa-comments me-2"></i>Forum
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <nav class="cv-news-filters" aria-label="Filter by industry">
+        <a asp-action="Index" asp-route-page="1"
+           class="cv-news-pill @(string.IsNullOrEmpty(currentCategory) ? "is-active" : "")">All industries</a>
+        @foreach (var (value, label) in NewsCategories.Filters)
+        {
+            <a asp-action="Index" asp-route-category="@value" asp-route-page="1"
+               class="cv-news-pill @(currentCategory == value ? "is-active" : "")">@label</a>
+        }
+    </nav>
+
+    @if (!Model.Any())
+    {
+        <div class="cv-dash-panel cv-news-empty">
+            <i class="fa-solid fa-newspaper cv-news-empty-icon" aria-hidden="true"></i>
+            <h2 class="h5 mb-2">No articles yet</h2>
+            <p class="text-cv-secondary mb-0">
+                @if (!string.IsNullOrEmpty(currentCategory))
+                {
+                    <text>No @NewsCategories.GetDisplayName(currentCategory) stories right now. Try another filter or check back after the next RSS sync.</text>
+                }
+                else
+                {
+                    <text>Check back soon — headlines sync from gaming, music, and film sources.</text>
+                }
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var n in Model)
+            {
+                <div class="col-md-6 col-xl-4">
+                    <article class="cv-news-card h-100">
+                        @if (!string.IsNullOrEmpty(n.ImageUrl))
+                        {
+                            <a asp-action="Details" asp-route-id="@n.NewsId" class="cv-news-card-media">
+                                <img src="@n.ImageUrl" alt="" loading="lazy" />
+                            </a>
+                        }
+                        <div class="cv-news-card-body">
+                            <div class="cv-news-card-meta">
+                                <span class="cv-news-category">@NewsCategories.GetDisplayName(n.Category)</span>
+                                @if (!string.IsNullOrEmpty(n.SourceName))
+                                {
+                                    <span class="cv-news-source">via @n.SourceName</span>
+                                }
+                            </div>
+                            <h2 class="cv-news-card-title">
+                                <a asp-action="Details" asp-route-id="@n.NewsId">@n.Title</a>
+                            </h2>
+                            <p class="cv-news-card-excerpt">
+                                @(n.Content.Length > 140 ? n.Content.Substring(0, 140) + "…" : n.Content)
+                            </p>
+                            <div class="cv-news-card-foot">
+                                <time class="text-cv-secondary small">@n.CreatedDate.ToString("MMM d, yyyy")</time>
+                                <a asp-action="Details" asp-route-id="@n.NewsId" class="cv-news-read-more">
+                                    Read more <i class="fa-solid fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+
+    @{
+        ViewData["PaginationCategory"] = currentCategory;
+    }
+    <div class="cv-news-pagination">
+        @await Html.PartialAsync("_Pagination", Model)
+    </div>
+</div>

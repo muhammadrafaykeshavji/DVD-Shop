@@ -1,0 +1,63 @@
+@model Game
+@{
+    var isEdit = Model?.GameId > 0;
+    var gameStudioId = ViewBag.GameStudioId as SelectList;
+    var categoryId = ViewBag.CategoryId as SelectList;
+    var releaseDate = ViewBag.ReleaseDate as string ?? DateTime.UtcNow.ToString("yyyy-MM-dd");
+    var dvdCover = ViewBag.DvdCoverUrl as string;
+}
+<div class="cv-product-form-help mb-4">
+    <i class="fa-solid fa-gamepad text-cv-gold me-2"></i>
+    <div>
+        <strong>Game DVDs</strong>
+        <p class="mb-0 small text-cv-secondary">Add games here — not on the Music Albums page. After saving, set price &amp; stock under <strong>Products</strong>.</p>
+    </div>
+</div>
+<div class="row g-4">
+    <div class="col-md-8">
+        <label asp-for="Title" class="form-label">Game title</label>
+        <input asp-for="Title" class="form-control" placeholder="e.g. Grand Theft Auto V" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Release date</label>
+        <input type="date" name="releaseDate" class="form-control" value="@releaseDate" />
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Developer / studio</label>
+        <select name="gameStudioId" class="form-select" asp-items="gameStudioId">
+            <option value="">— Select studio —</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Category</label>
+        <select name="categoryId" class="form-select" asp-items="categoryId">
+            <option value="">— Select category —</option>
+        </select>
+    </div>
+    @if (isEdit)
+    {
+        <input type="hidden" asp-for="GameId" />
+    }
+    <div class="col-12">
+        <label class="form-label">DVD cover URL</label>
+        <input type="text" name="dvdCoverUrl" class="form-control" value="@dvdCover" placeholder="https://example.com/cover.jpg" />
+        <label class="form-label mt-2">Or upload DVD cover</label>
+        <input type="file" name="dvdCoverFile" class="form-control" accept="image/*" />
+    </div>
+    <div class="col-12">
+        <label asp-for="ImageUrl" class="form-label">Wide landscape banner (product page background)</label>
+        <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/wide-banner.jpg" />
+        <span class="field-hint">Steam-style wide art — shown blurred behind the product page.</span>
+        <label class="form-label mt-2">Or upload banner</label>
+        <input type="file" name="imageFile" class="form-control" accept="image/*" />
+    </div>
+    <div class="col-12">
+        <label asp-for="PreviewUrl" class="form-label">Gameplay / trailer URL</label>
+        <input asp-for="PreviewUrl" class="form-control" placeholder="https://…" />
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Game description…"></textarea>
+    </div>
+</div>

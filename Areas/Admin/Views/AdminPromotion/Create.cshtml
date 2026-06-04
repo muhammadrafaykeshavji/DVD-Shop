@@ -1,0 +1,22 @@
+@model Promotion
+@{
+    ViewData["Title"] = "Create Promotion";
+    ViewData["FormTitle"] = "Add Promotion";
+    ViewData["FormIcon"] = "fa-percent";
+    ViewData["SaveLabel"] = "Create Promotion";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card cv-admin-form-wide">
+    <form asp-action="Create" method="post" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly"></div>
+        @await Html.PartialAsync("_Form", Model)
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}

@@ -1,0 +1,28 @@
+@using E_project_DVD_Shop.Data
+@model string?
+@{
+    var url = Model;
+}
+@if (!string.IsNullOrWhiteSpace(url))
+{
+    var embed = MediaCatalogLinks.IsYouTubeUrl(url) ? MediaCatalogLinks.ToYouTubeEmbed(url) : null;
+    if (embed != null)
+    {
+        <div class="ratio ratio-16x9 mb-2">
+            <iframe src="@embed"
+                    title="Trailer preview"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+    }
+    else if (url.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+    {
+        <audio controls preload="metadata" class="w-100"><source src="@url" type="audio/mpeg" /></audio>
+    }
+    else
+    {
+        <video controls class="w-100" style="max-height:280px;"><source src="@url" type="video/mp4" /></video>
+    }
+}

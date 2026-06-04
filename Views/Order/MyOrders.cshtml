@@ -1,0 +1,145 @@
+@model PaginatedList<Order>
+@using E_project_DVD_Shop.Models
+@{
+    ViewData["Title"] = "Order History";
+    var totalOrders = Model.TotalCount;
+    string StatusClass(OrderStatus s) => s switch
+    {
+        OrderStatus.Pending or OrderStatus.Processing => "cv-status-pending",
+        OrderStatus.Shipped => "cv-status-shipped",
+        OrderStatus.Delivered => "cv-status-delivered",
+        _ => "cv-status-cancelled"
+    };
+}
+
+<div class="cv-member-dashboard cv-orders-page">
+    <section class="cv-dash-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-box me-1"></i> Purchases</p>
+                <h1 class="cv-dash-title">Order History</h1>
+                <p class="cv-dash-sub mb-0">
+                    @if (totalOrders == 0)
+                    {
+                        <text>Your past orders will appear here after checkout.</text>
+                    }
+                    else
+                    {
+                        <text>You have <strong>@totalOrders</strong> @(totalOrders == 1 ? "order" : "orders") on record.</text>
+                    }
+                </p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                    <i class="fa-solid fa-compact-disc me-2"></i>Browse shop
+                </a>
+                <a asp-controller="Account" asp-action="Dashboard" class="btn btn-cv-outline">
+                    <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            @if (!Model.Any())
+            {
+                <div class="cv-dash-panel cv-orders-empty">
+                    <i class="fa-solid fa-bag-shopping cv-orders-empty-icon" aria-hidden="true"></i>
+                    <h2 class="h5 mb-2">No orders yet</h2>
+                    <p class="text-cv-secondary mb-4">When you place an order, it will show up here with status and details.</p>
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                        <i class="fa-solid fa-compact-disc me-2"></i>Start shopping
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="cv-dash-panel">
+                    <div class="cv-dash-panel-head">
+                        <h2 class="cv-dash-panel-title mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-cv-gold"></i>All orders</h2>
+                        @if (Model.TotalPages > 1)
+                        {
+                            <span class="text-cv-secondary small">Page @Model.PageIndex of @Model.TotalPages</span>
+                        }
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table cv-table cv-dash-table cv-orders-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var o in Model)
+                                {
+                                    var itemCount = o.OrderItems?.Count ?? 0;
+                                    <tr class="cv-dash-order-row" onclick="window.location='@Url.Action("Details", new { id = o.OrderId })'">
+                                        <td class="text-white-cell fw-semibold">
+                                            <a asp-controller="Order" asp-action="Details" asp-route-id="@o.OrderId" class="text-cv-gold" onclick="event.stopPropagation();">#@o.OrderId</a>
+                                        </td>
+                                        <td class="text-cv-secondary">@o.OrderDate.ToString("MMM d, yyyy")</td>
+                                        <td class="text-cv-secondary">@itemCount @(itemCount == 1 ? "item" : "items")</td>
+                                        <td class="text-cv-gold fw-semibold">$@o.TotalAmount.ToString("F2")</td>
+                                        <td><span class="cv-status @StatusClass(o.Status)">@o.Status</span></td>
+                                        <td class="text-end">
+                                            <a asp-controller="Order" asp-action="Details" asp-route-id="@o.OrderId" class="cv-orders-details-link" onclick="event.stopPropagation();">
+                                                Details <i class="fa-solid fa-arrow-right ms-1"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @await Html.PartialAsync("_Pagination", Model)
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <div class="cv-dash-panel cv-dash-panel--sidebar">
+                <h2 class="cv-dash-panel-title mb-3"><i class="fa-solid fa-bolt me-2 text-cv-gold"></i>Quick links</h2>
+                <nav class="cv-dash-links">
+                    <a asp-controller="Order" asp-action="Cart" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-cart-shopping"></i></span>
+                        <span>
+                            <strong>Shopping cart</strong>
+                            <small>Review items before checkout</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Wishlist" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-heart"></i></span>
+                        <span>
+                            <strong>My collection</strong>
+                            <small>Saved wishlist titles</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Account" asp-action="Profile" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-user"></i></span>
+                        <span>
+                            <strong>My profile</strong>
+                            <small>Email, phone, and security</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                    <a asp-controller="Download" asp-action="Index" class="cv-dash-link-tile">
+                        <span class="cv-dash-link-icon"><i class="fa-solid fa-download"></i></span>
+                        <span>
+                            <strong>Downloads</strong>
+                            <small>Free tracks and previews</small>
+                        </span>
+                        <i class="fa-solid fa-chevron-right cv-dash-link-arrow"></i>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

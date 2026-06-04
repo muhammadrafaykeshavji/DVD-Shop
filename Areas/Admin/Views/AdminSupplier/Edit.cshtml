@@ -1,0 +1,23 @@
+@model Supplier
+@{
+    ViewData["Title"] = "Edit Supplier";
+    ViewData["FormTitle"] = $"Edit Supplier — {Model.Name}";
+    ViewData["FormIcon"] = "fa-truck";
+    ViewData["SaveLabel"] = "Update Supplier";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card">
+    <form asp-action="Edit" method="post" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="SupplierId" />
+        <div asp-validation-summary="ModelOnly"></div>
+        @await Html.PartialAsync("_Form", Model)
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}

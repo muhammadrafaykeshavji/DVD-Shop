@@ -1,0 +1,57 @@
+@model List<Wishlist>
+@{
+    ViewData["Title"] = "My Collection";
+    var count = Model.Count;
+}
+
+<div class="cv-member-dashboard cv-wishlist-page">
+    <section class="cv-dash-hero">
+        <div class="cv-dash-hero-inner">
+            <div>
+                <p class="cv-dash-eyebrow"><i class="fa-solid fa-heart me-1"></i> Saved titles</p>
+                <h1 class="cv-dash-title">My Collection</h1>
+                <p class="cv-dash-sub mb-0">
+                    @if (count == 0)
+                    {
+                        <text>Save games, movies, and music you want to buy later.</text>
+                    }
+                    else
+                    {
+                        <text>You have <strong>@count</strong> @(count == 1 ? "title" : "titles") in your wishlist.</text>
+                    }
+                </p>
+            </div>
+            <div class="cv-dash-hero-actions">
+                <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                    <i class="fa-solid fa-compact-disc me-2"></i>Browse shop
+                </a>
+                <a asp-controller="Order" asp-action="Cart" class="btn btn-cv-outline">
+                    <i class="fa-solid fa-cart-shopping me-2"></i>View cart
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @if (!Model.Any())
+    {
+        <div class="cv-dash-panel cv-wishlist-empty">
+            <i class="fa-regular fa-heart cv-wishlist-empty-icon" aria-hidden="true"></i>
+            <h2 class="h5 mb-2">Your collection is empty</h2>
+            <p class="text-cv-secondary mb-4">Tap the heart on any product in the shop to save it here.</p>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-cv-primary">
+                <i class="fa-solid fa-compact-disc me-2"></i>Explore the shop
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4 cv-wishlist-grid">
+            @foreach (var w in Model)
+            {
+                <div class="col-sm-6 col-lg-4 col-xl-3">
+                    @await Html.PartialAsync("_WishlistCard", w)
+                </div>
+            }
+        </div>
+    }
+</div>

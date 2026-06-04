@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="280" viewBox="0 0 1200 280">
+  <defs>
+    <linearGradient id="b" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0d1b3e"/>
+      <stop offset="50%" style="stop-color:#1a3060"/>
+      <stop offset="100%" style="stop-color:#0d1b3e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="280" fill="url(#b)"/>
+  <text x="600" y="130" text-anchor="middle" fill="#f0b429" font-family="Segoe UI, Arial, sans-serif" font-size="42" font-weight="700">È CineVault</text>
+  <text x="600" y="170" text-anchor="middle" fill="#8899bb" font-family="Segoe UI, Arial, sans-serif" font-size="18">Music · Games · Movies</text>
+</svg>

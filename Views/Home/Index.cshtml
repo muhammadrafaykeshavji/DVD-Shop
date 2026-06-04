@@ -1,0 +1,156 @@
+@model HomeViewModel
+@using E_project_DVD_Shop.Helpers
+@{
+    ViewData["Title"] = "Home";
+    ViewData["FullWidth"] = true;
+    var spotlight = Model.SpotlightProduct;
+    var featured = Model.FeaturedProducts.Take(4).ToList();
+    var arrivals = Model.NewReleases.Take(8).ToList();
+    const int featuredPerSlide = 2;
+    const int arrivalsPerSlide = 4;
+    var hasNews = Model.LatestGamingNews != null || Model.LatestMusicNews != null || Model.LatestFilmNews != null;
+}
+
+<div class="cv-home-page cv-home-boutique">
+    <section class="cv-home-band cv-home-band--warm cv-boutique-hero cv-animate cv-animate--up">
+        <div class="cv-hero-content">
+            <div class="row align-items-center g-4 g-xl-5">
+                <div class="col-lg-6 cv-hero-copy">
+                    <p class="cv-boutique-label">Premium DVD Collection</p>
+                    <h1 class="cv-boutique-title">Timeless stories.<br /><span class="cv-title-gold">Forever yours.</span></h1>
+                    <p class="cv-boutique-lead">
+                        Handpicked classics and modern gems. Curated for true collectors and film lovers.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a asp-controller="Product" asp-action="Index" class="btn cv-btn-boutique-gold">Shop collection</a>
+                        <a asp-controller="Product" asp-action="Index" class="btn cv-btn-boutique-outline">Browse genres</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 cv-hero-spotlight-wrap">
+                    @if (spotlight != null)
+                    {
+                        var cover = ProductCatalogHelper.GetCoverUrl(spotlight) ?? "/images/placeholder-album.svg";
+                        <div class="cv-boutique-spotlight cv-boutique-spotlight--hero">
+                            <div class="row align-items-center cv-spotlight-inner">
+                                <div class="col-5">
+                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@spotlight.ProductId" class="cv-boutique-spotlight-art">
+                                        <img src="@cover" alt="@ProductCatalogHelper.GetTitle(spotlight)"
+                                             onerror="this.onerror=null;this.src='/images/placeholder-album.svg';" />
+                                    </a>
+                                </div>
+                                <div class="col-7">
+                                    <div class="cv-boutique-spotlight-info">
+                                        <span class="cv-boutique-spotlight-label">Featured</span>
+                                        <h2>@ProductCatalogHelper.GetTitle(spotlight)</h2>
+                                        <p class="cv-boutique-spotlight-meta">
+                                            @ProductCatalogHelper.GetCreditName(spotlight)<br />
+                                            @ProductCatalogHelper.GetMediaType(spotlight) · @ProductCatalogHelper.GetCategoryName(spotlight)
+                                        </p>
+                                        <p class="cv-boutique-spotlight-price">$@spotlight.Price.ToString("F2")</p>
+                                        <a asp-controller="Product" asp-action="Details" asp-route-id="@spotlight.ProductId" class="btn cv-btn-boutique-gold">
+                                            View DVD <i class="fa-solid fa-arrow-right ms-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (featured.Any())
+    {
+        <section class="cv-home-band cv-home-band--gray cv-animate cv-animate--up">
+            <div class="cv-home-content">
+                <div class="cv-section-head">
+                    <h2 class="cv-boutique-heading">This week in the vault</h2>
+                    <a asp-controller="Product" asp-action="Index" class="cv-section-see-all">See all</a>
+                </div>
+                <div id="cvFeaturedCarousel" class="carousel slide cv-boutique-carousel" data-bs-ride="carousel" data-bs-interval="5500" data-bs-pause="hover">
+                    <div class="carousel-inner">
+                        @for (var i = 0; i < featured.Count; i += featuredPerSlide)
+                        {
+                            var slideItems = featured.Skip(i).Take(featuredPerSlide).ToList();
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <div class="cv-boutique-featured-list">
+                                    @foreach (var item in slideItems)
+                                    {
+                                        @await Html.PartialAsync("_HomeBoutiqueFeaturedStrip", item)
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    @if (arrivals.Any())
+    {
+        <section class="cv-home-band cv-home-band--warm cv-animate cv-animate--up">
+            <div class="cv-home-content">
+                <div class="cv-section-head">
+                    <h2 class="cv-boutique-heading">New arrivals</h2>
+                    <a asp-controller="Product" asp-action="Index" class="cv-section-see-all">Shop all</a>
+                </div>
+                <div id="cvArrivalsCarousel" class="carousel slide cv-boutique-carousel" data-bs-ride="carousel" data-bs-interval="5500" data-bs-pause="hover">
+                    <div class="carousel-inner">
+                        @for (var i = 0; i < arrivals.Count; i += arrivalsPerSlide)
+                        {
+                            var slideItems = arrivals.Skip(i).Take(arrivalsPerSlide).ToList();
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <div class="row g-3 g-lg-4">
+                                    @foreach (var item in slideItems)
+                                    {
+                                        <div class="col-6 col-md-3">
+                                            @await Html.PartialAsync("_HomeBoutiqueArrivalTile", item)
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    @if (hasNews)
+    {
+        <section class="cv-home-band cv-home-band--gray cv-animate cv-animate--up">
+            <div class="cv-home-content">
+                @await Html.PartialAsync("_HomeBoutiqueNewsStrip", Model)
+            </div>
+        </section>
+    }
+
+    <section class="cv-home-band cv-home-band--warm cv-home-band--values cv-animate cv-animate--up">
+        <div class="cv-home-content">
+            <div class="cv-boutique-value-row">
+                <div class="cv-boutique-value-item">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <strong>Free shipping</strong>
+                    <span>On orders over $50</span>
+                </div>
+                <div class="cv-boutique-value-item">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <strong>Secure payments</strong>
+                    <span>Safe &amp; trusted checkout</span>
+                </div>
+                <div class="cv-boutique-value-item">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <strong>Easy returns</strong>
+                    <span>30-day return policy</span>
+                </div>
+                <div class="cv-boutique-value-item">
+                    <i class="fa-solid fa-award"></i>
+                    <strong>Collector quality</strong>
+                    <span>Carefully curated titles</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

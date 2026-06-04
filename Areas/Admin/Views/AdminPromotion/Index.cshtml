@@ -1,0 +1,64 @@
+@model PaginatedList<Promotion>
+@{
+    ViewData["Title"] = "Manage Promotion";
+    ViewData["AdminTitle"] = "Manage Promotions";
+    const string entityLabel = "promotion";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th>Title</th>
+                    <th>Discount</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Status</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No promotions yet. <a asp-action="Create">Add the first promotion</a>.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.PromotionId</span></td>
+                            <td class="text-white-cell">@item.Title</td>
+                            <td class="text-cv-gold fw-semibold">@item.DiscountPercent%</td>
+                            <td>@item.StartDate.ToString("MMM dd, yyyy")</td>
+                            <td>@item.EndDate.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="cv-status cv-status-delivered">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="cv-status cv-status-cancelled">Inactive</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.PromotionId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

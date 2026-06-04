@@ -1,0 +1,50 @@
+@model Song
+@{
+    var isEdit = Model?.SongId > 0;
+}
+<div class="row g-4">
+    <div class="col-md-6">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" placeholder="Track title" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="AlbumId" class="form-label">Album</label>
+        <select asp-for="AlbumId" class="form-select" asp-items="ViewBag.AlbumId">
+            <option value="">— Select album —</option>
+        </select>
+        <span asp-validation-for="AlbumId" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="DurationSeconds" class="form-label">Duration (seconds)</label>
+        <input asp-for="DurationSeconds" type="number" min="1" class="form-control" placeholder="e.g. 240" />
+        <span asp-validation-for="DurationSeconds" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="ImageUrl" class="form-label">Artwork URL</label>
+        <input asp-for="ImageUrl" class="form-control" placeholder="https://example.com/track-art.jpg" />
+        <span class="field-hint">Optional — leave empty to use the parent album cover on the shop.</span>
+        @if (isEdit && !string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="cv-form-preview mt-2">
+                <img src="@Model.ImageUrl" alt="@Model.Title" />
+            </div>
+        }
+        <label class="form-label mt-3">Or upload artwork</label>
+        <input type="file" name="imageFile" class="form-control" accept="image/*" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="PreviewUrl" class="form-label">Preview URL</label>
+        <input asp-for="PreviewUrl" class="form-control" placeholder="https://…" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="DownloadUrl" class="form-label">Download URL</label>
+        <input asp-for="DownloadUrl" class="form-control" placeholder="https://…" />
+    </div>
+    <div class="col-12">
+        <div class="form-check form-switch">
+            <input asp-for="IsFree" class="form-check-input" />
+            <label asp-for="IsFree" class="form-check-label">Free preview track</label>
+        </div>
+    </div>
+</div>

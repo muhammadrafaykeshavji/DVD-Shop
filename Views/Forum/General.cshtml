@@ -1,0 +1,62 @@
+@model List<ForumPost>
+@{
+    ViewData["Title"] = "General";
+    ViewData["ChannelTitle"] = "General";
+    ViewData["ChannelIcon"] = "fa-hashtag";
+}
+
+<div class="cv-discord-messages cv-discord-messages--chat" id="chatMessages">
+    @if (!Model.Any())
+    {
+        <div class="cv-discord-empty cv-forum-empty">
+            <i class="fa-solid fa-comments"></i>
+            <p class="mb-0">No messages yet. Say hello!</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var msg in Model)
+        {
+            @await Html.PartialAsync("_ForumMessage", msg)
+        }
+    }
+</div>
+
+<footer class="cv-discord-composer">
+    @if (User.IsInRole("Member") || User.IsInRole("Admin"))
+    {
+        <form asp-action="SendChat" method="post" class="cv-discord-compose-form">
+            @Html.AntiForgeryToken()
+            <div class="cv-discord-compose-inner">
+                <textarea name="Content" class="form-control cv-discord-compose-input" rows="1"
+                          placeholder="Message #general" required maxlength="4000"></textarea>
+                <button type="submit" class="btn btn-cv-primary cv-discord-send" title="Send">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="cv-discord-compose-guest">
+            <a asp-controller="Account" asp-action="Login" class="text-cv-gold fw-semibold">Sign in</a>
+            <span class="text-cv-secondary"> to join the conversation.</span>
+        </div>
+    }
+</footer>
+
+@section Scripts {
+    <script>
+        (() => {
+            const box = document.getElementById("chatMessages");
+            if (box) box.scrollTop = box.scrollHeight;
+            const input = document.querySelector(".cv-discord-compose-input");
+            if (input) {
+                input.addEventListener("input", () => {
+                    input.style.height = "auto";
+                    input.style.height = Math.min(input.scrollHeight, 120) + "px";
+                });
+            }
+        })();
+    </script>
+}

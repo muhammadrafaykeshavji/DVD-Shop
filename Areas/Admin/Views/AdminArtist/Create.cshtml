@@ -1,0 +1,22 @@
+@model Artist
+@{
+    ViewData["Title"] = "Create Artist";
+    ViewData["FormTitle"] = "Add New Artist";
+    ViewData["FormIcon"] = "fa-microphone";
+    ViewData["SaveLabel"] = "Create Artist";
+}
+
+@await Html.PartialAsync("_AdminFormHeader")
+
+<div class="cv-dash-panel cv-admin-form-card">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" class="cv-admin-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly"></div>
+        @await Html.PartialAsync("_Form", Model)
+        @await Html.PartialAsync("_AdminFormFooter")
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_AdminFormScripts")
+}

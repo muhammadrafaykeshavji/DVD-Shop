@@ -1,0 +1,69 @@
+@model PaginatedList<Review>
+@{
+    ViewData["Title"] = "Manage Review";
+    ViewData["AdminTitle"] = "Manage Reviews";
+    const string entityLabel = "review";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th>User</th>
+                    <th>Product</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No reviews yet. Reviews will appear here after customers rate products on the shop.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.ReviewId</span></td>
+                            <td class="text-white-cell">@item.User?.UserName</td>
+                            <td>@E_project_DVD_Shop.Helpers.ProductCatalogHelper.GetTitle(item.Product!)</td>
+                            <td>
+                                <span class="text-cv-gold">
+                                    @for (var i = 0; i < item.Rating; i++) { <i class="fa-solid fa-star"></i> }
+                                    @for (var i = item.Rating; i < 5; i++) { <i class="fa-regular fa-star"></i> }
+                                </span>
+                            </td>
+                            <td class="text-cv-secondary small">
+                                @if (string.IsNullOrWhiteSpace(item.Comment))
+                                {
+                                    <span class="text-cv-muted">—</span>
+                                }
+                                else
+                                {
+                                    @(item.Comment.Length > 80 ? item.Comment[..80] + "…" : item.Comment)
+                                }
+                            </td>
+                            <td>@item.CreatedDate.ToString("MMM dd, yyyy")</td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.ReviewId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

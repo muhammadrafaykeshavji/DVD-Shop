@@ -1,0 +1,62 @@
+@model PaginatedList<PurchasingInvoice>
+@{
+    ViewData["Title"] = "Manage Purchasing Invoice";
+    ViewData["AdminTitle"] = "Purchasing Invoices";
+    const string entityLabel = "invoice";
+}
+
+@await Html.PartialAsync("_AdminPageHeader")
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th>Supplier</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Notes</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No invoices yet. <a asp-action="Create">Add the first invoice</a>.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.PurchasingInvoiceId</span></td>
+                            <td class="text-white-cell">@item.Supplier?.Name</td>
+                            <td>@item.InvoiceDate.ToString("MMM dd, yyyy")</td>
+                            <td class="text-cv-gold fw-semibold">$@item.Amount.ToString("N2")</td>
+                            <td class="text-cv-secondary small">
+                                @if (string.IsNullOrWhiteSpace(item.Notes))
+                                {
+                                    <span class="text-cv-muted">—</span>
+                                }
+                                else
+                                {
+                                    @(item.Notes.Length > 60 ? item.Notes[..60] + "…" : item.Notes)
+                                }
+                            </td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.PurchasingInvoiceId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)

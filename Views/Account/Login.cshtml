@@ -1,0 +1,41 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "_Layout";
+}
+<div class="cv-auth-wrap">
+    <div class="cv-auth-card">
+        <div class="cv-auth-logo">◈ CineVault</div>
+        <h5 class="text-white text-center mb-4">Welcome back</h5>
+
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label"></label>
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = "Username" })
+                @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger small" })
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+            </div>
+            <div class="mb-3 form-check">
+                @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+            <button type="submit" class="btn btn-cv-primary w-100 mb-3">Sign In</button>
+        }
+
+        <p class="text-center small mb-1">
+            <a asp-action="Register" class="text-cv-gold">Forgot Password?</a>
+        </p>
+        <p class="text-center text-cv-secondary small mb-0">
+            Don't have an account? @Html.ActionLink("Register", "Register", "Account", null, new { @class = "text-cv-gold fw-semibold" })
+        </p>
+    </div>
+</div>
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

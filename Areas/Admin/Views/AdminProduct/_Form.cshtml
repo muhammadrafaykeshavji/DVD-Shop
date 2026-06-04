@@ -1,0 +1,113 @@
+@model Product
+@using E_project_DVD_Shop.Helpers
+@using E_project_DVD_Shop.Models.Entities
+@{
+    var coverImage = ViewBag.CoverImageUrl as string;
+    var isCreate = ViewBag.IsCreate as bool? == true;
+    var albums = ViewBag.MusicAlbums as IEnumerable<Album> ?? Enumerable.Empty<Album>();
+    var games = ViewBag.Games as IEnumerable<Game> ?? Enumerable.Empty<Game>();
+    var movies = ViewBag.Movies as IEnumerable<Movie> ?? Enumerable.Empty<Movie>();
+    var catalogKey = ViewBag.CatalogKey as string ?? "";
+}
+<div class="cv-product-form-help mb-4">
+    <i class="fa-solid fa-circle-info text-cv-gold me-2"></i>
+    <div>
+        <strong>List a DVD on the shop</strong>
+        <p class="mb-0 small text-cv-secondary">
+            Add titles first in the right place:
+            <a asp-area="Admin" asp-controller="AdminAlbum" asp-action="Index" class="text-cv-gold">Music Albums</a>,
+            <a asp-area="Admin" asp-controller="AdminGame" asp-action="Index" class="text-cv-gold">Games</a>, or
+            <a asp-area="Admin" asp-controller="AdminMovie" asp-action="Index" class="text-cv-gold">Movies</a>.
+            Then pick the title here and set <strong>price</strong> and <strong>stock</strong>.
+        </p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">1. Choose DVD title</p>
+        <label class="form-label">Title</label>
+        <select name="catalogKey" class="form-select" id="productCatalogSelect">
+            <option value="">— Select music album, game, or movie —</option>
+            <optgroup label="Music albums">
+                @foreach (var album in albums)
+                {
+                    <option value="a:@album.AlbumId" selected="@(catalogKey == $"a:{album.AlbumId}")">
+                        @album.Title · @ProductCatalogHelper.GetCreditName(album)
+                    </option>
+                }
+            </optgroup>
+            <optgroup label="Games">
+                @foreach (var game in games)
+                {
+                    <option value="g:@game.GameId" selected="@(catalogKey == $"g:{game.GameId}")">
+                        @game.Title · @(game.GameStudio?.Name ?? "—")
+                    </option>
+                }
+            </optgroup>
+            <optgroup label="Movies">
+                @foreach (var movie in movies)
+                {
+                    <option value="m:@movie.MovieId" selected="@(catalogKey == $"m:{movie.MovieId}")">
+                        @movie.Title · @(movie.FilmStudio?.Name ?? "—")
+                    </option>
+                }
+            </optgroup>
+        </select>
+        @if (isCreate)
+        {
+            <span class="field-hint">Only titles not yet on the shop are listed.</span>
+        }
+    </div>
+
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">2. Price &amp; stock</p>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Price" class="form-label">Selling price (USD)</label>
+        <div class="input-group">
+            <span class="input-group-text cv-input-addon">$</span>
+            <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" placeholder="19.99" />
+        </div>
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Stock" class="form-label">Stock quantity</label>
+        <input asp-for="Stock" type="number" min="0" class="form-control" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check form-switch mb-2">
+            <input asp-for="IsAvailable" class="form-check-input" />
+            <label asp-for="IsAvailable" class="form-check-label">Visible on shop</label>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="ProducerId" class="form-label">Producer <span class="text-cv-muted">(optional)</span></label>
+        <select asp-for="ProducerId" class="form-select" asp-items="ViewBag.ProducerId">
+            <option value="">— None —</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="SupplierId" class="form-label">Supplier <span class="text-cv-muted">(optional)</span></label>
+        <select asp-for="SupplierId" class="form-select" asp-items="ViewBag.SupplierId">
+            <option value="">— None —</option>
+        </select>
+    </div>
+
+    <div class="col-12">
+        <p class="cv-form-section-title mb-2">3. Cover image <span class="text-cv-muted fw-normal">(optional)</span></p>
+        <p class="field-hint mb-3">Override the shop cover here, or set it when you add the title under Music Albums / Games / Movies.</p>
+        @if (!string.IsNullOrEmpty(coverImage))
+        {
+            <div class="cv-form-preview mb-3">
+                <img src="@coverImage" alt="Cover" />
+            </div>
+        }
+        <label class="form-label">Cover image URL</label>
+        <input type="text" name="coverImageUrl" class="form-control" value="@coverImage" placeholder="https://example.com/cover.jpg" />
+        <label class="form-label mt-3">Or upload cover</label>
+        <input type="file" name="coverFile" class="form-control" accept="image/*" />
+    </div>
+</div>

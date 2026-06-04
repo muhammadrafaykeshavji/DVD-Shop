@@ -1,0 +1,23 @@
+@using E_project_DVD_Shop.Helpers
+@model Product
+@{
+    var cover = ProductCatalogHelper.GetCoverUrl(Model) ?? "/images/placeholder-album.svg";
+    var title = ProductCatalogHelper.GetTitle(Model);
+    var credit = ProductCatalogHelper.GetCreditName(Model);
+    var category = ProductCatalogHelper.GetCategoryName(Model);
+    var media = ProductCatalogHelper.GetMediaType(Model);
+}
+<article class="cv-boutique-featured-strip">
+    <a asp-controller="Product" asp-action="Details" asp-route-id="@Model.ProductId" class="cv-boutique-strip-cover">
+        <img src="@cover" alt="@title" loading="lazy"
+             onerror="this.onerror=null;this.src='/images/placeholder-album.svg';" />
+    </a>
+    <div class="cv-boutique-strip-body">
+        <h3 class="cv-boutique-strip-title">@title</h3>
+        <p class="cv-boutique-strip-meta">@credit · @media · @category</p>
+        <p class="cv-boutique-strip-price">$@Model.Price.ToString("F2")</p>
+    </div>
+    <a asp-controller="Product" asp-action="Details" asp-route-id="@Model.ProductId" class="btn cv-btn-boutique-gold btn-sm">
+        View DVD
+    </a>
+</article>

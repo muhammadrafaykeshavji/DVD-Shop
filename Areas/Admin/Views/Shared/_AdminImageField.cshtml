@@ -1,0 +1,23 @@
+@{
+    var label = ViewData["ImageLabel"] as string ?? "Image URL";
+    var urlFieldName = ViewData["UrlFieldName"] as string ?? "imageUrl";
+    var fileInputName = ViewData["FileInputName"] as string ?? "imageFile";
+    var currentUrl = ViewData["CurrentImageUrl"] as string;
+    var hint = ViewData["ImageHint"] as string ?? "Paste a direct image link, or upload a file below. Upload takes priority if both are provided.";
+    var isEdit = !string.IsNullOrEmpty(currentUrl);
+}
+<div class="col-12">
+    <p class="cv-form-section-title mb-2">@(ViewData["ImageSectionTitle"] as string ?? "Image")</p>
+    @if (isEdit)
+    {
+        <div class="cv-form-preview mb-2">
+            <img src="@currentUrl" alt="Preview" onerror="this.style.display='none'" />
+        </div>
+    }
+    <label class="form-label">@label</label>
+    <input type="text" name="@urlFieldName" class="form-control" value="@currentUrl" placeholder="https://example.com/image.jpg" />
+    <span class="field-hint">@hint</span>
+    <label class="form-label mt-3">Or upload image</label>
+    <input type="file" name="@fileInputName" class="form-control" accept="image/*" />
+    <span class="field-hint">JPG, PNG or WebP — max 5MB.</span>
+</div>

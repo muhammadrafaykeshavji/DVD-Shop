@@ -1,0 +1,36 @@
+@model HomeViewModel
+@using E_project_DVD_Shop.Helpers
+@{
+    var items = new[]
+    {
+        (Model.LatestGamingNews, "game", NewsCategories.Gaming),
+        (Model.LatestMusicNews, "music", NewsCategories.Music),
+        (Model.LatestFilmNews, "movie", NewsCategories.Film)
+    }.Where(x => x.Item1 != null).ToList();
+
+    if (!items.Any()) return;
+
+    string Thumb(News article, string icon) =>
+        !string.IsNullOrWhiteSpace(article.ImageUrl) ? article.ImageUrl! : $"/images/covers/{icon}.svg";
+}
+
+<div class="cv-section-head">
+    <h2 class="cv-boutique-heading">From the industry</h2>
+    <a asp-controller="News" asp-action="Index" class="cv-section-see-all">View all</a>
+</div>
+<div class="cv-boutique-news-list">
+        @foreach (var (article, icon, _) in items)
+        {
+            <a asp-controller="News" asp-action="Details" asp-route-id="@article!.NewsId" class="cv-boutique-news-strip">
+                <div class="cv-boutique-news-thumb">
+                    <img src="@Thumb(article!, icon)" alt="" loading="lazy"
+                         onerror="this.onerror=null;this.src='/images/covers/@(icon).svg';" />
+                </div>
+                <div class="cv-boutique-news-body">
+                    <time class="cv-boutique-news-date">@article!.CreatedDate.ToString("MMM dd, yyyy")</time>
+                    <h6>@article.Title</h6>
+                    <span class="cv-boutique-news-link">Read more <i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            </a>
+        }
+    </div>

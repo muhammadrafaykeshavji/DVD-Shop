@@ -1,0 +1,22 @@
+@model List<Feedback>
+@{ ViewData["Title"] = "My Feedback"; }
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="cv-section-title mb-0">My Feedback</h1>
+    @Html.ActionLink("Send Feedback", "Create", "Feedback", null, new { @class = "btn btn-cv-primary" })
+</div>
+
+@foreach (var f in Model)
+{
+    <div class="cv-card cv-card-body mb-3">
+        <p class="text-white mb-2">@f.Message</p>
+        <small class="text-cv-muted">@f.CreatedDate.ToShortDateString()</small>
+        @if (f.AdminReply != null)
+        {
+            <div class="cv-toast mt-3 mb-0">
+                <strong class="text-cv-gold">Admin reply:</strong>
+                <span class="text-cv-secondary"> @f.AdminReply</span>
+            </div>
+        }
+    </div>
+}

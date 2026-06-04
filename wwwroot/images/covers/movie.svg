@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="560" viewBox="0 0 400 560">
+  <rect width="400" height="560" fill="#0d1b3e"/>
+  <rect x="120" y="200" width="160" height="120" rx="8" fill="none" stroke="#f0b429" stroke-width="3"/>
+  <polygon points="175,240 175,280 215,260" fill="#f0b429"/>
+  <text x="200" y="360" text-anchor="middle" fill="#f0b429" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="600">Movie DVD</text>
+  <text x="200" y="388" text-anchor="middle" fill="#8899bb" font-family="Segoe UI, Arial, sans-serif" font-size="13">CineVault</text>
+</svg>

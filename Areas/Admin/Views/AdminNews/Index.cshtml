@@ -1,0 +1,103 @@
+@model PaginatedList<News>
+@{
+    ViewData["Title"] = "Manage News";
+    ViewData["AdminTitle"] = "Manage News";
+    const string entityLabel = "article";
+}
+
+@{
+    ViewData["ShowAddButton"] = true;
+}
+@await Html.PartialAsync("_AdminPageHeader")
+
+<form asp-action="SyncRss" method="post" class="mb-3">
+    @Html.AntiForgeryToken()
+    <button type="submit" class="btn btn-cv-outline btn-sm">
+        <i class="fa-solid fa-arrows-rotate me-1"></i> Sync RSS (IGN · Pitchfork · Deadline)
+    </button>
+</form>
+
+@{
+    var adminCategory = ViewBag.Category as string;
+}
+<form method="get" asp-action="Index" class="cv-admin-filters cv-dash-panel cv-admin-filters-panel mb-4">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-4 col-lg-5">
+      <label class="form-label small text-cv-secondary mb-1">Search</label>
+      <input type="search" name="search" value="@Context.Request.Query["search"]" class="form-control" placeholder="Headline..." />
+    </div>
+    <div class="col-md-4 col-lg-3">
+      <label class="form-label small text-cv-secondary mb-1">Industry</label>
+      <select name="category" class="form-select">
+        <option value="">All industries</option>
+        @foreach (var (value, label) in NewsCategories.Filters)
+        {
+            <option value="@value" selected="@(adminCategory == value)">@label</option>
+        }
+      </select>
+    </div>
+    <div class="col-auto d-flex gap-2">
+      <button type="submit" class="btn btn-cv-primary"><i class="fa-solid fa-filter me-1"></i> Apply</button>
+      <a asp-action="Index" class="btn btn-cv-outline">Clear</a>
+    </div>
+  </div>
+</form>
+
+<div class="cv-admin-table-wrap">
+    <div class="table-responsive">
+        <table class="table cv-table cv-table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="cv-col-id">ID</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Source</th>
+                    <th>Posted</th>
+                    <th>Status</th>
+                    <th class="text-end cv-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="cv-table-empty">
+                            <i class="fa-solid fa-inbox fa-2x mb-2 d-block opacity-50"></i>
+                            No news articles yet. <a asp-action="Create">Add the first article</a>.
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><span class="cv-id-badge">@item.NewsId</span></td>
+                            <td class="text-white-cell">@item.Title</td>
+                            <td>@NewsCategories.GetDisplayName(item.Category)</td>
+                            <td>@(item.SourceName ?? (item.ExternalId != null ? "RSS" : "Manual"))</td>
+                            <td>@item.CreatedDate.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="cv-status cv-status-delivered">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="cv-status cv-status-cancelled">Inactive</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                @await Html.PartialAsync("_AdminTableActions", (item.NewsId, entityLabel))
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@{
+    ViewData["PaginationCategory"] = adminCategory;
+}
+@await Html.PartialAsync("~/Views/Shared/_Pagination.cshtml", Model)
